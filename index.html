@@ -455,7 +455,6 @@ function displayResults(results, targetQ, targetPs, bestResult) {
     const marginTag = margin > 20
       ? `<span class="tag">餘量 +${margin}%</span>`
       : `<span class="tag warn">餘量 +${margin}%</span>`;
-    const bladesTag = r.blades ? `<span class="tag">${r.blades} 葉</span>` : '';
     const badge = isBest ? `<span class="best-badge">✦ 最佳選擇</span>` : '';
     return `
     <div class="result-card${isBest ? ' best' : ''}">
@@ -491,7 +490,6 @@ function displayResults(results, targetQ, targetPs, bestResult) {
         </div>
         <div class="tags" style="margin-top:10px">
           ${marginTag}
-          ${bladesTag}
         </div>
       </div>
     </div>`;
