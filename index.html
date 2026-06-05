@@ -206,6 +206,13 @@
     font-weight: 600;
   }
   .tag.warn { background: #fff3e0; color: #e65100; }
+  .result-card.best { border: 2px solid var(--primary); }
+  .best-badge {
+    background: var(--primary); color: white;
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 12px; font-weight: 600; white-space: nowrap;
+  }
+
   .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
   
   .q-ps-row {
@@ -393,11 +400,22 @@ function runSelect() {
     if (a.size !== b.size) return parseInt(a.size) - parseInt(b.size);
     return a.hp - b.hp;
   });
-  
-  displayResults(matched, q, ps);
+
+  // 未限定馬力與極數時，以最小 HP（同 HP 取最小機型）為最佳選擇
+  let bestResult = null;
+  if (!pole && !hp_max) {
+    bestResult = matched.reduce((best, r) => {
+      if (!best) return r;
+      if (r.hp < best.hp) return r;
+      if (r.hp === best.hp && parseInt(r.size) < parseInt(best.size)) return r;
+      return best;
+    }, null);
+  }
+
+  displayResults(matched, q, ps, bestResult);
 }
 
-function displayResults(results, targetQ, targetPs) {
+function displayResults(results, targetQ, targetPs, bestResult) {
   const section = document.getElementById('results-section');
   const container = document.getElementById('results');
   const countBadge = document.getElementById('result-count');
@@ -416,18 +434,21 @@ function displayResults(results, targetQ, targetPs) {
   }
 
   container.innerHTML = results.map(r => {
+    const isBest = bestResult && r === bestResult;
     const margin = ((r.maxQ - targetQ) / targetQ * 100).toFixed(0);
     const marginTag = margin > 20
       ? `<span class="tag">餘量 +${margin}%</span>`
       : `<span class="tag warn">餘量 +${margin}%</span>`;
     const bladesTag = r.blades ? `<span class="tag">${r.blades} 葉</span>` : '';
+    const badge = isBest ? `<span class="best-badge">✦ 最佳選擇</span>` : '';
     return `
-    <div class="result-card">
+    <div class="result-card${isBest ? ' best' : ''}">
       <div class="card-header">
         <div>
           <div class="model-name">VAF-${r.size}</div>
           <div class="model-sub">直徑 ${r.size}mm 軸流風機</div>
         </div>
+        ${badge}
       </div>
       <div class="card-body">
         <div class="spec-grid">
