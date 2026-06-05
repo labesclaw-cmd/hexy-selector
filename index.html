@@ -511,7 +511,11 @@ function displayResults(results, targetQ, targetPs) {
             <span class="spec-value">${r.pole} <span class="unit">P</span></span>
           </div>
         </div>
-        <div class="tags" style="margin-top:12px">
+        <hr class="divider">
+        <div class="q-ps-row">
+          最大可達 <strong>${Math.round(r.maxQ)} CMM</strong>
+        </div>
+        <div class="tags" style="margin-top:10px">
           ${marginTag}
           ${extraTag}
           ${bladesTag}
