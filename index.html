@@ -549,17 +549,31 @@ function renderCard(r, targetQ, isBest, priority) {
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div class="model-name">VAF-${r.size}</div>
-          <div class="model-sub">${r.pole}P · ${r.hp} HP</div>
+          <div class="model-sub">${r.pole}P · ${r.hp} HP · 直徑 ${r.size}mm</div>
         </div>
         <div style="text-align:right">
           <span class="tag ${ni.cls}" style="font-size:11px">${ni.icon} ${ni.label}</span>
           <div style="font-size:11px;color:var(--sub);margin-top:4px">造價：${ct}</div>
         </div>
       </div>
-      <div class="card-body" style="padding:10px 16px">
+      <div class="card-body" style="padding:12px 16px">
+        <div class="spec-grid">
+          <div class="spec-item">
+            <span class="spec-label">可達風量</span>
+            <span class="spec-value highlight-value">${Math.round(r.maxQ)} <span class="unit">CMM</span></span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">馬力</span>
+            <span class="spec-value">${r.hp} <span class="unit">HP</span></span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">最大靜壓</span>
+            <span class="spec-value">${r.ps_max} <span class="unit">mmAq</span></span>
+          </div>
+        </div>
+        <hr class="divider">
         <div class="tags">
           <span class="${marginCls}">餘量 +${margin}%</span>
-          <span class="tag" style="background:#f5f5f5;color:#616161">${Math.round(r.maxQ)} CMM · ${r.ps_max} mmAq</span>
           ${bladesTag}
         </div>
       </div>
