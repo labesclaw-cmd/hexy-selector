@@ -40,7 +40,7 @@
     letter-spacing: 0.3px;
   }
   header p { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-  .container { max-width: 680px; margin: 0 auto; padding: 16px; }
+  .container { max-width: 680px; margin: 0 auto; padding: 16px; padding-bottom: 80px; }
   
   /* Input Card */
   .input-card {
@@ -234,7 +234,7 @@
   /* Toast */
   .toast {
     position: fixed;
-    bottom: 24px;
+    bottom: 70px;
     left: 50%;
     transform: translateX(-50%) translateY(80px);
     background: #323232;
@@ -247,58 +247,51 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
   
-  /* Fan type toggle */
-  .type-toggle {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .type-btn {
-    flex: 1;
-    padding: 10px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    background: #fafafa;
-    color: var(--sub);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: center;
-  }
-  .type-btn.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-  }
+  /* Options rows */
+  .options-row { display: none; gap: 12px; margin-bottom: 12px; }
+  .options-row.visible { display: grid; grid-template-columns: 1fr 1fr; }
+  .options-row.single.visible { grid-template-columns: 1fr; }
 
-  /* Enclosure toggle (SBA only) */
-  .enclosure-row {
-    display: none;
+  /* Bottom Tab Bar */
+  .bottom-tabs {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; display: flex;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+    z-index: 50; height: 60px;
   }
-  .enclosure-row.visible {
-    display: grid;
+  .tab-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2px; padding: 4px 2px; cursor: pointer;
+    border: none; background: transparent; color: var(--sub);
+    font-size: 9px; font-weight: 600; letter-spacing: 0.2px;
+    transition: color 0.15s; position: relative;
+  }
+  .tab-item .tab-icon { font-size: 17px; line-height: 1; }
+  .tab-item.active { color: var(--primary); }
+  .tab-item.active::before {
+    content: ''; position: absolute; top: 0;
+    left: 20%; right: 20%; height: 3px;
+    background: var(--primary); border-radius: 0 0 3px 3px;
   }
 
   @media (min-width: 480px) {
     .field-row { grid-template-columns: 1fr 1fr 1fr; }
     .spec-grid { grid-template-columns: repeat(4, 1fr); }
+    .tab-item { font-size: 10px; }
   }
 </style>
 </head>
 <body>
 <header>
-  <h1 id="header-title">和旭風機 選型系統</h1>
-  <p id="header-sub">VAF-560 ～ VAF-2000 軸流｜SBA-250 ～ SBA-1000 前傾離心</p>
+  <h1>和旭風機 選型系統</h1>
+  <p id="header-sub">VAF 軸流｜SBA/RBA/HBS 離心｜RP 無殼｜HR 屋頂</p>
 </header>
 
 <div class="container">
   <div class="input-card">
-    <h2>輸入條件</h2>
-    <div class="type-toggle">
-      <button class="type-btn active" id="btn-vaf" onclick="setFanType('vaf')">軸流風機 VAF</button>
-      <button class="type-btn" id="btn-sba" onclick="setFanType('sba')">前傾離心 SBA</button>
-    </div>
+    <h2 id="input-title">VAF 軸流風機 選型</h2>
     <div class="field-row">
       <div class="field">
         <label>風量 Q <span class="unit">CMM</span></label>
@@ -309,7 +302,8 @@
         <input type="number" id="ps" inputmode="decimal" placeholder="例：40" min="0" step="1">
       </div>
     </div>
-    <div class="field-row" id="vaf-options">
+    <!-- VAF options -->
+    <div class="options-row visible" id="vaf-options">
       <div class="field">
         <label>極數</label>
         <select id="pole">
@@ -321,9 +315,40 @@
         </select>
       </div>
       <div class="field">
-        <label>HP 上限</label>
+        <label>HP 指定</label>
         <select id="hp_max">
           <option value="">不限</option>
+          <option value="1">1 HP</option>
+          <option value="2">2 HP</option>
+          <option value="3">3 HP</option>
+          <option value="5">5 HP</option>
+          <option value="7.5">7.5 HP</option>
+          <option value="10">10 HP</option>
+          <option value="15">15 HP</option>
+          <option value="20">20 HP</option>
+          <option value="25">25 HP</option>
+          <option value="30">30 HP</option>
+          <option value="40">40 HP</option>
+          <option value="50">50 HP</option>
+          <option value="75">75 HP</option>
+          <option value="100">100 HP</option>
+        </select>
+      </div>
+    </div>
+    <!-- SBA/RBA/HBS options -->
+    <div class="options-row" id="centrifugal-options">
+      <div class="field">
+        <label>安裝形式</label>
+        <select id="enclosure">
+          <option value="box">箱型（f=2）</option>
+          <option value="bare">裸機（f=0.5）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>HP 上限</label>
+        <select id="cent_hp_max">
+          <option value="">不限</option>
+          <option value="0.5">≤ 0.5 HP</option>
           <option value="1">≤ 1 HP</option>
           <option value="2">≤ 2 HP</option>
           <option value="3">≤ 3 HP</option>
@@ -336,34 +361,33 @@
           <option value="30">≤ 30 HP</option>
           <option value="40">≤ 40 HP</option>
           <option value="50">≤ 50 HP</option>
-          <option value="75">≤ 75 HP</option>
-          <option value="100">≤ 100 HP</option>
         </select>
       </div>
     </div>
-    <div class="field-row enclosure-row" id="sba-options">
-      <div class="field">
-        <label>安裝形式</label>
-        <select id="enclosure">
-          <option value="box">箱型（f=2）</option>
-          <option value="bare">裸機（f=0.5）</option>
-        </select>
-      </div>
+    <!-- RP options -->
+    <div class="options-row single" id="rp-options">
       <div class="field">
         <label>HP 上限</label>
-        <select id="sba_hp_max">
+        <select id="rp_hp_max">
           <option value="">不限</option>
-          <option value="0.5">≤ 0.5 HP</option>
           <option value="1">≤ 1 HP</option>
           <option value="2">≤ 2 HP</option>
           <option value="3">≤ 3 HP</option>
           <option value="5">≤ 5 HP</option>
           <option value="7.5">≤ 7.5 HP</option>
           <option value="10">≤ 10 HP</option>
-          <option value="15">≤ 15 HP</option>
-          <option value="20">≤ 20 HP</option>
-          <option value="30">≤ 30 HP</option>
-          <option value="50">≤ 50 HP</option>
+        </select>
+      </div>
+    </div>
+    <!-- HR options -->
+    <div class="options-row single" id="hr-options">
+      <div class="field">
+        <label>子系列</label>
+        <select id="hr_type">
+          <option value="all">全部（HRA + HRD）</option>
+          <option value="hra">HRA — 屋頂軸流直結式</option>
+          <option value="hrd">HRD — 屋頂離心直結式</option>
+          <option value="hrb">HRB — 屋頂後傾（非必要不選）</option>
         </select>
       </div>
     </div>
@@ -380,6 +404,26 @@
   </div>
 </div>
 
+<nav class="bottom-tabs">
+  <button class="tab-item active" id="tab-vaf" onclick="setFanType('vaf')">
+    <span class="tab-icon">💨</span>VAF軸流
+  </button>
+  <button class="tab-item" id="tab-sba" onclick="setFanType('sba')">
+    <span class="tab-icon">🌀</span>SBA前傾
+  </button>
+  <button class="tab-item" id="tab-rba" onclick="setFanType('rba')">
+    <span class="tab-icon">🔄</span>RBA後傾
+  </button>
+  <button class="tab-item" id="tab-hbs" onclick="setFanType('hbs')">
+    <span class="tab-icon">🌊</span>HBS單吸
+  </button>
+  <button class="tab-item" id="tab-rp" onclick="setFanType('rp')">
+    <span class="tab-icon">⚙️</span>RP無殼
+  </button>
+  <button class="tab-item" id="tab-hr" onclick="setFanType('hr')">
+    <span class="tab-icon">🏠</span>HR屋頂
+  </button>
+</nav>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -473,118 +517,311 @@ const SBA_SIZES = [
   {size:"1000", D_imp:1015, base:"800", N_max:470,  min_hp:5}
 ];
 
+// RBA 雙吸後傾離心風機
+const RBA_BASES = {
+  "315": { D_imp:325, N_base:2000, pts:[
+    {Q:108.78,Ps:0,      Pt:7.449,  P:0.927},
+    {Q:100.20,Ps:11.735, Pt:18.061, P:0.951},
+    {Q:89.10, Ps:25.510, Pt:30.408, P:0.954},
+    {Q:78.12, Ps:38.367, Pt:42.143, P:0.937},
+    {Q:66.30, Ps:50.306, Pt:53.061, P:0.912},
+    {Q:49.68, Ps:64.082, Pt:65.612, P:0.848},
+    {Q:31.92, Ps:71.633, Pt:72.347, P:0.701},
+    {Q:18.06, Ps:72.755, Pt:72.959, P:0.567}
+  ]},
+  "400": { D_imp:412, N_base:2000, pts:[
+    {Q:257.46,Ps:0,       Pt:17.143, P:3.953},
+    {Q:234.54,Ps:26.327,  Pt:40.510, P:4.039},
+    {Q:201.60,Ps:44.286,  Pt:54.796, P:3.627},
+    {Q:180.06,Ps:62.245,  Pt:70.612, P:3.503},
+    {Q:157.26,Ps:80.0,    Pt:86.327, P:3.379},
+    {Q:124.68,Ps:102.143, Pt:106.122,P:3.148},
+    {Q:91.44, Ps:120.612, Pt:122.755,P:2.826},
+    {Q:81.96, Ps:117.449, Pt:119.184,P:2.532},
+    {Q:41.10, Ps:122.449, Pt:122.959,P:1.902}
+  ]},
+  "450": { D_imp:462, N_base:1800, pts:[
+    {Q:332.04,Ps:0,       Pt:18.061, P:5.153},
+    {Q:306.06,Ps:20.816,  Pt:36.020, P:5.141},
+    {Q:277.02,Ps:42.347,  Pt:54.796, P:5.073},
+    {Q:243.36,Ps:65.204,  Pt:74.796, P:4.919},
+    {Q:197.10,Ps:92.449,  Pt:98.776, P:4.610},
+    {Q:147.18,Ps:115.306, Pt:118.776,P:4.143},
+    {Q:118.02,Ps:126.531, Pt:128.776,P:3.775},
+    {Q:95.10, Ps:123.571, Pt:125.0,  P:3.192},
+    {Q:75.84, Ps:124.898, Pt:125.816,P:2.778}
+  ]},
+  "630": { D_imp:649, N_base:1200, pts:[
+    {Q:623.52,Ps:0,       Pt:16.122, P:7.897},
+    {Q:567.06,Ps:27.143,  Pt:40.408, P:8.258},
+    {Q:486.54,Ps:50.408,  Pt:60.204, P:7.888},
+    {Q:390.72,Ps:75.816,  Pt:82.143, P:7.194},
+    {Q:272.88,Ps:106.429, Pt:109.490,P:6.323},
+    {Q:253.86,Ps:103.469, Pt:106.122,P:5.799},
+    {Q:215.28,Ps:106.735, Pt:108.673,P:5.259},
+    {Q:197.04,Ps:102.347, Pt:103.878,P:4.832},
+    {Q:119.46,Ps:106.327, Pt:106.939,P:3.735}
+  ]}
+};
+const RBA_SIZES = [
+  {size:"315", D_imp:325,  base:"315", N_max:3408, min_hp:1},
+  {size:"355", D_imp:365,  base:"315", N_max:3035, min_hp:1},
+  {size:"400", D_imp:412,  base:"400", N_max:2689, min_hp:1},
+  {size:"450", D_imp:462,  base:"450", N_max:2398, min_hp:2},
+  {size:"500", D_imp:520,  base:"450", N_max:2130, min_hp:2},
+  {size:"560", D_imp:580,  base:"450", N_max:1910, min_hp:3},
+  {size:"630", D_imp:649,  base:"630", N_max:1707, min_hp:3},
+  {size:"710", D_imp:726,  base:"630", N_max:1526, min_hp:5},
+  {size:"800", D_imp:820,  base:"630", N_max:1351, min_hp:7.5},
+  {size:"900", D_imp:910,  base:"630", N_max:1217, min_hp:7.5},
+  {size:"1000",D_imp:1020, base:"630", N_max:1086, min_hp:10},
+  {size:"1120",D_imp:1135, base:"630", N_max:976,  min_hp:20},
+  {size:"1250",D_imp:1260, base:"630", N_max:879,  min_hp:20},
+  {size:"1400",D_imp:1420, base:"630", N_max:780,  min_hp:25},
+  {size:"1600",D_imp:1620, base:"630", N_max:684,  min_hp:25}
+];
+
+// HBS 單吸前傾離心風機
+const HBS_BASES = {
+  "450": { D_imp:450, N_base:1761, pts:[
+    {Q:140,Ps:0.1,  Pt:11.9, P:2.2},
+    {Q:120,Ps:30.9, Pt:39.6, P:2.2},
+    {Q:98, Ps:61.4, Pt:67.1, P:2.0},
+    {Q:78, Ps:82.9, Pt:86.6, P:1.9},
+    {Q:58, Ps:94.4, Pt:96.4, P:1.7},
+    {Q:43, Ps:100.1,Pt:101.2,P:1.6},
+    {Q:20, Ps:105.5,Pt:105.7,P:1.2}
+  ]},
+  "560": { D_imp:560, N_base:1474, pts:[
+    {Q:198,Ps:0.3,  Pt:14.1, P:3.7},
+    {Q:172,Ps:28.6, Pt:38.9, P:3.5},
+    {Q:142,Ps:61.7, Pt:68.8, P:3.3},
+    {Q:115,Ps:83.1, Pt:87.7, P:3.0},
+    {Q:85, Ps:103.4,Pt:105.9,P:2.6},
+    {Q:57, Ps:114.1,Pt:115.3,P:2.2},
+    {Q:39, Ps:115.6,Pt:116.1,P:1.9}
+  ]},
+  "630": { D_imp:630, N_base:1246, pts:[
+    {Q:276,Ps:0.3,  Pt:15.9, P:4.6},
+    {Q:238,Ps:32.5, Pt:44.1, P:4.4},
+    {Q:198,Ps:57.1, Pt:65.2, P:4.0},
+    {Q:161,Ps:74.0, Pt:79.3, P:3.4},
+    {Q:114,Ps:96.1, Pt:98.7, P:3.0},
+    {Q:74, Ps:107.6,Pt:108.7,P:2.4},
+    {Q:40, Ps:114.3,Pt:114.6,P:1.8}
+  ]},
+  "800": { D_imp:800, N_base:1572, pts:[
+    {Q:610,Ps:0.4,  Pt:33.3, P:24.9},
+    {Q:528,Ps:78.0, Pt:102.5,P:24.1},
+    {Q:435,Ps:155.3,Pt:171.7,P:22.5},
+    {Q:354,Ps:203.9,Pt:214.7,P:20.6},
+    {Q:258,Ps:255.1,Pt:260.9,P:17.8},
+    {Q:168,Ps:278.3,Pt:280.8,P:14.8},
+    {Q:82, Ps:290.8,Pt:291.3,P:11.4}
+  ]},
+  "900": { D_imp:900, N_base:850, pts:[
+    {Q:526,Ps:0.8,  Pt:14.5, P:9.5},
+    {Q:453,Ps:39.4, Pt:49.6, P:8.4},
+    {Q:299,Ps:74.7, Pt:79.2, P:6.5},
+    {Q:220,Ps:90.1, Pt:92.4, P:5.4},
+    {Q:148,Ps:103.7,Pt:104.8,P:4.5},
+    {Q:77, Ps:104.6,Pt:104.9,P:3.5}
+  ]},
+  "1000": { D_imp:1000, N_base:928, pts:[
+    {Q:834,Ps:0.2,  Pt:21.4, P:18.5},
+    {Q:716,Ps:49.1, Pt:64.7, P:18.1},
+    {Q:598,Ps:71.8, Pt:82.7, P:16.2},
+    {Q:476,Ps:101.8,Pt:108.7,P:14.3},
+    {Q:237,Ps:148.9,Pt:150.6,P:10.0}
+  ]},
+  "1120": { D_imp:1120, N_base:950, pts:[
+    {Q:1056,Ps:1.8, Pt:22.8, P:24.1},
+    {Q:910, Ps:65.0,Pt:80.5, P:25.0},
+    {Q:754, Ps:95.6,Pt:106.3,P:23.0},
+    {Q:447, Ps:161.6,Pt:165.3,P:19.1},
+    {Q:190, Ps:187.5,Pt:188.2,P:14.8}
+  ]}
+};
+const HBS_SIZES = [
+  {size:"315", D_imp:315,  base:"450",  N_max:3880, min_hp:1},
+  {size:"355", D_imp:355,  base:"450",  N_max:3443, min_hp:1},
+  {size:"400", D_imp:400,  base:"450",  N_max:3056, min_hp:1},
+  {size:"450", D_imp:450,  base:"450",  N_max:2716, min_hp:1},
+  {size:"500", D_imp:500,  base:"450",  N_max:2445, min_hp:2},
+  {size:"560", D_imp:560,  base:"560",  N_max:2180, min_hp:2},
+  {size:"630", D_imp:630,  base:"630",  N_max:1940, min_hp:3},
+  {size:"710", D_imp:710,  base:"630",  N_max:1720, min_hp:3},
+  {size:"800", D_imp:800,  base:"800",  N_max:1530, min_hp:5},
+  {size:"900", D_imp:900,  base:"900",  N_max:1360, min_hp:7.5},
+  {size:"1000",D_imp:1000, base:"1000", N_max:1220, min_hp:10},
+  {size:"1120",D_imp:1120, base:"1120", N_max:1090, min_hp:15},
+  {size:"1250",D_imp:1250, base:"1120", N_max:980,  min_hp:20},
+  {size:"1400",D_imp:1400, base:"1120", N_max:870,  min_hp:25},
+  {size:"1600",D_imp:1600, base:"1120", N_max:760,  min_hp:25},
+  {size:"1800",D_imp:1800, base:"1120", N_max:680,  min_hp:40}
+];
+
+// RP 無殼式 (f=0.5 always)
+const RP_BASES = {
+  "560": { D_imp:570, N_base:1500, pts:[
+    {Q:308,Ps:0,   Pt:13.2, P:2.3},
+    {Q:279,Ps:23.6,Pt:34.4, P:2.8},
+    {Q:249,Ps:44.8,Pt:53.4, P:3.3},
+    {Q:214,Ps:62.6,Pt:68.9, P:3.5},
+    {Q:181,Ps:74.6,Pt:79.2, P:3.6},
+    {Q:136,Ps:83.1,Pt:85.6, P:3.3},
+    {Q:95, Ps:86.1,Pt:87.3, P:2.8}
+  ]},
+  "710": { D_imp:720, N_base:1500, pts:[
+    {Q:618,Ps:0,    Pt:21.9, P:7.0},
+    {Q:570,Ps:36.4, Pt:55.1, P:9.0},
+    {Q:512,Ps:70.4, Pt:85.4, P:10.6},
+    {Q:448,Ps:100.6,Pt:112.1,P:11.7},
+    {Q:376,Ps:123.4,Pt:131.4,P:11.8},
+    {Q:302,Ps:137.3,Pt:142.6,P:11.2},
+    {Q:211,Ps:142.6,Pt:145.1,P:9.6}
+  ]}
+};
+const RP_SIZES = [
+  {size:"560", D_imp:570,  base:"560", N_max:1943, min_hp:1},
+  {size:"630", D_imp:640,  base:"560", N_max:1731, min_hp:1},
+  {size:"710", D_imp:720,  base:"710", N_max:1538, min_hp:2},
+  {size:"800", D_imp:810,  base:"710", N_max:1368, min_hp:2},
+  {size:"900", D_imp:910,  base:"710", N_max:1217, min_hp:2},
+  {size:"1000",D_imp:1010, base:"710", N_max:1097, min_hp:3},
+  {size:"1120",D_imp:1130, base:"710", N_max:980,  min_hp:5},
+  {size:"1250",D_imp:1260, base:"710", N_max:879,  min_hp:5},
+  {size:"1400",D_imp:1420, base:"710", N_max:780,  min_hp:10}
+];
+
+// HR 屋頂式（查表法，Ps=0/5/10/15/20/25 mmAq）
+const HR_DATA = {
+  "HRA-560": [{hp:1,  pole:4, q:[92,91,89,87,83,78]},   {hp:0.5,pole:6, q:[61,59,54,46,34,20]}],
+  "HRA-630": [{hp:2,  pole:4, q:[137,136,134,131,126,120]},{hp:0.5,pole:6,q:[91,89,82,71,55,35]}],
+  "HRA-710": [{hp:3,  pole:4, q:[196,194,190,185,179,171]},{hp:1,  pole:6,q:[131,126,117,103,84,60]}],
+  "HRA-800": [{hp:5,  pole:4, q:[265,271,273,271,266,257]},{hp:2,  pole:6,q:[177,182,174,155,124,81]}],
+  "HRA-900": [{hp:7.5,pole:4, q:[347,324,301,277,253,229]},{hp:3,  pole:6,q:[231,197,161,124,87,48]}],
+  "HRA-1000":[{hp:10, pole:4, q:[404,388,372,355,338,321]},{hp:5,  pole:6,q:[269,245,220,193,166,138]}],
+  "HRA-1120":[{hp:15, pole:4, q:[520,506,492,476,460,443]},{hp:7.5,pole:6,q:[346,325,301,275,245,213]}],
+  "HRD-105": [{hp:0.5,pole:4, q:[43,38,36,30,22,16]}],
+  "HRD-135": [{hp:0.5,pole:4, q:[60,54,51,47,43,40]}],
+  "HRD-165": [{hp:0.5,pole:6, q:[79,71,66,57,44,41]}],
+  "HRD-210": [{hp:1,  pole:6, q:[124,112,105,88,71,60]}],
+  "HRD-240": [{hp:1,  pole:6, q:[184,165,156,132,101,93]}],
+  "HRD-280": [{hp:2,  pole:6, q:[290,250,230,185,152,135]}],
+  "HRD-320": [{hp:3,  pole:6, q:[368,337,311,266,208,170]}],
+  "HRB-240": [{hp:0.5,pole:4, q:[128,108,96,68,null,null]}],
+  "HRB-280": [{hp:1,  pole:4, q:[201,183,170,137,95,null]}],
+  "HRB-320": [{hp:2,  pole:4, q:[297,266,253,221,181,156]}],
+  "HRB-365": [{hp:2,  pole:4, q:[340,303,278,227,164,110]}],
+  "HRB-420": [{hp:3,  pole:4, q:[481,433,408,340,269,227]}]
+};
+
+const MOTOR_TABLE = [
+  {hp:0.5,kw:0.375},{hp:1,kw:0.75},{hp:2,kw:1.5},{hp:3,kw:2.2},{hp:5,kw:3.7},
+  {hp:7.5,kw:5.5},{hp:10,kw:7.5},{hp:15,kw:11},{hp:20,kw:15},
+  {hp:25,kw:18.5},{hp:30,kw:22},{hp:40,kw:30},{hp:50,kw:37},
+  {hp:60,kw:45},{hp:75,kw:55},{hp:100,kw:75},{hp:125,kw:90}
+];
+
 let currentFanType = 'vaf';
 
 function setFanType(type) {
   currentFanType = type;
-  document.getElementById('btn-vaf').classList.toggle('active', type === 'vaf');
-  document.getElementById('btn-sba').classList.toggle('active', type === 'sba');
-  document.getElementById('vaf-options').style.display = type === 'vaf' ? '' : 'none';
-  const sbaOpts = document.getElementById('sba-options');
-  sbaOpts.classList.toggle('visible', type === 'sba');
+  ['vaf','sba','rba','hbs','rp','hr'].forEach(t =>
+    document.getElementById('tab-'+t).classList.toggle('active', t === type));
+  document.getElementById('vaf-options').classList.toggle('visible', type === 'vaf');
+  document.getElementById('centrifugal-options').classList.toggle('visible', ['sba','rba','hbs'].includes(type));
+  document.getElementById('rp-options').classList.toggle('visible', type === 'rp');
+  document.getElementById('hr-options').classList.toggle('visible', type === 'hr');
+  const titles = {
+    vaf:'VAF 軸流風機 選型', sba:'SBA 前傾式離心風機 選型',
+    rba:'RBA 後傾式離心風機 選型', hbs:'HBS 單吸前傾離心風機 選型',
+    rp:'RP 無殼離心風機 選型', hr:'HR 屋頂式風機 選型'
+  };
+  document.getElementById('input-title').textContent = titles[type];
   document.getElementById('results-section').style.display = 'none';
 }
 
-// SBA 選型核心：quadratic intersection algorithm (matches Excel v3.2)
-function sbaSelect(q_target, ps_target, f) {
-  const motorTable = [
-    {hp:0.5,kw:0.375},{hp:1,kw:0.75},{hp:2,kw:1.5},{hp:3,kw:2.2},{hp:5,kw:3.7},
-    {hp:7.5,kw:5.5},{hp:10,kw:7.5},{hp:15,kw:11},{hp:20,kw:15},
-    {hp:25,kw:18.5},{hp:30,kw:22},{hp:40,kw:30},{hp:50,kw:37}
-  ];
-
+// Shared centrifugal fan algorithm (quadratic intersection, matches Excel v3.2)
+function centrifugalSelect(q_target, ps_target, f, BASES, SIZES) {
   const results = [];
-
-  for (const sz of SBA_SIZES) {
-    const base = SBA_BASES[sz.base];
+  for (const sz of SIZES) {
+    const base = BASES[sz.base];
+    if (!base) continue;
     const r = sz.D_imp / base.D_imp;
-    const r3 = r * r * r;
-    const r5 = r3 * r * r;
-
-    // Corrected Ps for each base point: Ps_corr = Ps - f*(Pt - Ps) = Ps - f*Pv
-    const corrected = base.pts.map(pt => ({
-      Q: pt.Q,
-      Ps_c: pt.Ps - f * (pt.Pt - pt.Ps),
-      P: pt.P
-    }));
-
-    // a_target_eff = ps_target * r^4 / q_target^2 (parabola slope in base-curve space)
-    const r4 = r * r * r * r;
+    const r3 = r*r*r, r4 = r3*r, r5 = r4*r;
+    const corrected = base.pts.map(pt => ({ Q: pt.Q, Ps_c: pt.Ps - f*(pt.Pt - pt.Ps), P: pt.P }));
     const a_target_eff = ps_target * r4 / (q_target * q_target);
-
-    // Find adjacent pair where a_i < a_target_eff < a_{i+1}
-    // a_i = Ps_corr_i / Q_i^2
     const a_arr = corrected.map(pt => pt.Ps_c / (pt.Q * pt.Q));
-
     let idx = -1;
     for (let i = 0; i < a_arr.length - 1; i++) {
-      const a_lo = Math.min(a_arr[i], a_arr[i+1]);
-      const a_hi = Math.max(a_arr[i], a_arr[i+1]);
-      if (a_target_eff >= a_lo && a_target_eff <= a_hi) {
-        idx = i;
-        break;
-      }
+      const a_lo = Math.min(a_arr[i], a_arr[i+1]), a_hi = Math.max(a_arr[i], a_arr[i+1]);
+      if (a_target_eff >= a_lo && a_target_eff <= a_hi) { idx = i; break; }
     }
-    if (idx < 0) continue; // outside curve range
-
-    const pt1 = corrected[idx];
-    const pt2 = corrected[idx + 1];
-
-    // Linear interpolation: Ps_c(Q) = m*Q + c
+    if (idx < 0) continue;
+    const pt1 = corrected[idx], pt2 = corrected[idx+1];
     const m = (pt2.Ps_c - pt1.Ps_c) / (pt2.Q - pt1.Q);
     const c = pt1.Ps_c - m * pt1.Q;
-
-    // Solve: a_target_eff * Q^2 - m*Q - c = 0
-    const A = a_target_eff;
-    const B = -m;
-    const C = -c;
-    const disc = B * B - 4 * A * C;
+    const disc = m*m + 4*a_target_eff*c;
     if (disc < 0) continue;
-
-    const Q_base_star = (-B + Math.sqrt(disc)) / (2 * A);
+    const Q_base_star = (m + Math.sqrt(disc)) / (2 * a_target_eff);
     if (Q_base_star <= 0) continue;
-
-    // Operating speed
     const N_model = base.N_base * q_target / (Q_base_star * r3);
-    if (N_model > sz.N_max) continue;
-    if (N_model < 1) continue;
-
-    // Shaft power by linear interpolation between pt1 and pt2
-    const P_raw1 = base.pts[idx].P;
-    const P_raw2 = base.pts[idx + 1].P;
-    const Q1 = base.pts[idx].Q;
-    const Q2 = base.pts[idx + 1].Q;
-    const P_shaft = P_raw1 + (P_raw2 - P_raw1) * (Q_base_star - Q1) / (Q2 - Q1);
-
-    // Scale to model
+    if (N_model > sz.N_max || N_model < 1) continue;
+    const Q1 = base.pts[idx].Q, Q2 = base.pts[idx+1].Q;
+    const P_shaft = base.pts[idx].P + (base.pts[idx+1].P - base.pts[idx].P) * (Q_base_star - Q1) / (Q2 - Q1);
     const P_model = P_shaft * Math.pow(N_model / base.N_base, 3) * r5;
     const HP_calc = P_model / 0.746;
-
-    // Select motor HP (≥ min_hp and ≥ HP_calc)
-    const hp_min = Math.max(sz.min_hp, HP_calc);
-    const motor = motorTable.find(m => m.hp >= hp_min);
+    const motor = MOTOR_TABLE.find(m => m.hp >= Math.max(sz.min_hp, HP_calc));
     if (!motor) continue;
-
-    results.push({
-      size: sz.size,
-      D_imp: sz.D_imp,
-      N_rpm: Math.round(N_model),
-      N_max: sz.N_max,
-      hp: motor.hp,
-      HP_calc: HP_calc,
-      P_model: P_model,
-      r: r
-    });
+    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, hp: motor.hp, HP_calc, r });
   }
-
-  // Best = minimum HP, tie-break by smallest size
   const best = results.reduce((b, r) => {
     if (!b) return r;
     if (r.hp < b.hp) return r;
     if (r.hp === b.hp && parseInt(r.size) < parseInt(b.size)) return r;
     return b;
   }, null);
+  return { results, best };
+}
 
+// HR lookup: Ps=[0,5,10,15,20,25] mmAq
+const HR_PS = [0, 5, 10, 15, 20, 25];
+
+function hrInterpolateQ(qArr, targetPs) {
+  if (targetPs < 0) return null;
+  let lo = -1, hi = -1;
+  for (let i = 0; i < HR_PS.length; i++) {
+    if (HR_PS[i] <= targetPs) lo = i;
+    if (HR_PS[i] >= targetPs && hi < 0) hi = i;
+  }
+  if (lo < 0) lo = 0;
+  if (hi < 0) hi = HR_PS.length - 1;
+  const q_lo = qArr[lo], q_hi = qArr[hi];
+  if (q_lo === null || q_lo === undefined) return null;
+  if (lo === hi) return q_lo;
+  if (q_hi === null || q_hi === undefined) return null;
+  return q_lo + (q_hi - q_lo) * (targetPs - HR_PS[lo]) / (HR_PS[hi] - HR_PS[lo]);
+}
+
+function hrSelect(q_target, ps_target, typeFilter) {
+  const results = [];
+  for (const [model, configs] of Object.entries(HR_DATA)) {
+    if (typeFilter !== 'all' && !model.toLowerCase().startsWith(typeFilter)) continue;
+    for (const cfg of configs) {
+      const q_avail = hrInterpolateQ(cfg.q, ps_target);
+      if (q_avail === null || q_avail < q_target) continue;
+      results.push({ model, hp: cfg.hp, pole: cfg.pole, q_avail: Math.round(q_avail*10)/10, isHrb: model.startsWith('HRB') });
+    }
+  }
+  const nonHrb = results.filter(r => !r.isHrb);
+  const best = nonHrb.reduce((b, r) => {
+    if (!b) return r;
+    if (r.hp < b.hp) return r;
+    if (r.hp === b.hp && r.model < b.model) return r;
+    return b;
+  }, null) || (results.length > 0 ? results[0] : null);
   return { results, best };
 }
 
@@ -627,30 +864,55 @@ function getMaxQ(config, targetPs) {
 function runSelect() {
   const q = parseFloat(document.getElementById('q').value);
   const ps = parseFloat(document.getElementById('ps').value);
-
   if (isNaN(q) || isNaN(ps)) { showToast('請輸入風量和靜壓'); return; }
   if (q <= 0 || ps < 0) { showToast('風量必須 > 0，靜壓必須 ≥ 0'); return; }
 
-  if (currentFanType === 'sba') {
-    const enclosure = document.getElementById('enclosure').value;
-    const sba_hp_max = document.getElementById('sba_hp_max').value;
-    const f = enclosure === 'box' ? 2 : 0.5;
-    let { results, best } = sbaSelect(q, ps, f);
-    if (sba_hp_max) results = results.filter(r => r.hp <= parseFloat(sba_hp_max));
-    if (sba_hp_max && best && best.hp > parseFloat(sba_hp_max)) best = results[0] || null;
-    displaySbaResults(results, q, ps, best);
+  const type = currentFanType;
+
+  if (type === 'hr') {
+    const { results, best } = hrSelect(q, ps, document.getElementById('hr_type').value);
+    displayHrResults(results, q, ps, best);
     return;
   }
 
+  if (type === 'rp') {
+    const rp_hp_max = document.getElementById('rp_hp_max').value;
+    let { results, best } = centrifugalSelect(q, ps, 0.5, RP_BASES, RP_SIZES);
+    if (rp_hp_max) {
+      results = results.filter(r => r.hp <= parseFloat(rp_hp_max));
+      if (best && best.hp > parseFloat(rp_hp_max)) best = results[0] || null;
+    }
+    displayCentrifugalResults(results, q, ps, best, 'RP', '無殼式離心風機');
+    return;
+  }
+
+  if (['sba','rba','hbs'].includes(type)) {
+    const f = document.getElementById('enclosure').value === 'box' ? 2 : 0.5;
+    const cent_hp_max = document.getElementById('cent_hp_max').value;
+    const MAP = {
+      sba: [SBA_BASES, SBA_SIZES, 'SBA', '前傾式離心風機'],
+      rba: [RBA_BASES, RBA_SIZES, 'RBA', '後傾式離心風機'],
+      hbs: [HBS_BASES, HBS_SIZES, 'HBS', '單吸前傾離心風機']
+    };
+    const [BASES, SIZES, prefix, desc] = MAP[type];
+    let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES);
+    if (cent_hp_max) {
+      results = results.filter(r => r.hp <= parseFloat(cent_hp_max));
+      if (best && best.hp > parseFloat(cent_hp_max)) best = results[0] || null;
+    }
+    displayCentrifugalResults(results, q, ps, best, prefix, desc);
+    return;
+  }
+
+  // VAF
   const pole = document.getElementById('pole').value;
   const hp_max = document.getElementById('hp_max').value;
   const matched = [];
-
   for (const [size, configs] of Object.entries(DATA)) {
     const seen = new Map();
     for (const cfg of configs) {
       if (pole && cfg.pole !== parseInt(pole)) continue;
-      if (hp_max && cfg.hp > parseFloat(hp_max)) continue;
+      if (hp_max && cfg.hp !== parseFloat(hp_max)) continue;
       const maxQ = getMaxQ(cfg, ps);
       if (maxQ === null || maxQ < q) continue;
       const key = `${cfg.hp}-${cfg.pole}`;
@@ -659,36 +921,22 @@ function runSelect() {
     }
     for (const m of seen.values()) matched.push(m);
   }
-
-  matched.sort((a, b) => {
-    if (a.size !== b.size) return parseInt(a.size) - parseInt(b.size);
-    return a.hp - b.hp;
-  });
-
+  matched.sort((a, b) => parseInt(a.size) - parseInt(b.size) || a.hp - b.hp);
   let bestResult = null;
   if (!pole || !hp_max) {
-    const motorTable = [
-      {hp:1,kw:0.75},{hp:2,kw:1.5},{hp:3,kw:2.2},{hp:5,kw:3.7},
-      {hp:7.5,kw:5.5},{hp:10,kw:7.5},{hp:15,kw:11},{hp:20,kw:15},
-      {hp:25,kw:18.5},{hp:30,kw:22},{hp:40,kw:30},{hp:50,kw:37},
-      {hp:60,kw:45},{hp:75,kw:55},{hp:100,kw:75},{hp:125,kw:90}
-    ];
     const kW_req = q * ps / 2550;
-    const minRequiredHP = (motorTable.find(m => m.kw >= kW_req) || motorTable[motorTable.length - 1]).hp;
-    bestResult = matched
-      .filter(r => r.hp >= minRequiredHP)
-      .reduce((best, r) => {
-        if (!best) return r;
-        if (r.hp < best.hp) return r;
-        if (r.hp === best.hp && parseInt(r.size) < parseInt(best.size)) return r;
-        return best;
-      }, null);
+    const minHP = (MOTOR_TABLE.find(m => m.kw >= kW_req) || MOTOR_TABLE[MOTOR_TABLE.length-1]).hp;
+    bestResult = matched.filter(r => r.hp >= minHP).reduce((b, r) => {
+      if (!b) return r;
+      if (r.hp < b.hp) return r;
+      if (r.hp === b.hp && parseInt(r.size) < parseInt(b.size)) return r;
+      return b;
+    }, null);
   }
-
   displayResults(matched, q, ps, bestResult);
 }
 
-function renderSbaCard(r, isBest, targetQ, targetPs) {
+function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs) {
   const badge = isBest ? `<span class="best-badge">✦ 最佳選擇</span>` : '';
   const speedPct = Math.round(r.N_rpm / r.N_max * 100);
   const speedTag = speedPct <= 80
@@ -699,8 +947,8 @@ function renderSbaCard(r, isBest, targetQ, targetPs) {
   <div class="result-card${isBest ? ' best' : ''}">
     <div class="card-header">
       <div>
-        <div class="model-name">SBA-${r.size}</div>
-        <div class="model-sub">葉輪 ${r.D_imp}mm 前傾式離心風機</div>
+        <div class="model-name">${prefix}-${r.size}</div>
+        <div class="model-sub">葉輪 ${r.D_imp}mm ${fullDesc}</div>
       </div>
       ${badge}
     </div>
@@ -734,35 +982,79 @@ function renderSbaCard(r, isBest, targetQ, targetPs) {
   </div>`;
 }
 
-function displaySbaResults(results, targetQ, targetPs, best) {
+function displayCentrifugalResults(results, targetQ, targetPs, best, prefix, fullDesc) {
   const section = document.getElementById('results-section');
   const container = document.getElementById('results');
-  const countBadge = document.getElementById('result-count');
-
   section.style.display = 'block';
-  countBadge.textContent = results.length;
-
+  document.getElementById('result-count').textContent = results.length;
   if (results.length === 0) {
-    container.innerHTML = `
-      <div class="no-results">
-        <div class="icon">🔍</div>
-        <p>無符合條件的機型</p>
-        <p style="margin-top:8px;font-size:12px">請調整風量、靜壓或放寬條件</p>
-      </div>`;
+    container.innerHTML = `<div class="no-results"><div class="icon">🔍</div><p>無符合條件的機型</p><p style="margin-top:8px;font-size:12px">請調整風量、靜壓或放寬條件</p></div>`;
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
-
   let html = '';
   if (best) {
-    html += renderSbaCard(best, true, targetQ, targetPs);
+    html += renderCentrifugalCard(best, prefix, fullDesc, true, targetQ, targetPs);
     const others = results.filter(r => r !== best);
     if (others.length > 0) {
       html += `<div class="section-label">所有符合機型（${results.length} 款）</div>`;
-      html += others.map(r => renderSbaCard(r, false, targetQ, targetPs)).join('');
+      html += others.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs)).join('');
     }
   } else {
-    html = results.map(r => renderSbaCard(r, false, targetQ, targetPs)).join('');
+    html = results.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs)).join('');
+  }
+  container.innerHTML = html;
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderHrCard(r, isBest, targetQ, targetPs) {
+  const badge = isBest ? `<span class="best-badge">✦ 最佳選擇</span>` : '';
+  const margin = ((r.q_avail - targetQ) / targetQ * 100).toFixed(0);
+  const marginTag = margin >= 20
+    ? `<span class="tag">餘量 +${margin}%</span>`
+    : `<span class="tag warn">餘量 +${margin}%</span>`;
+  const warnTag = r.isHrb ? `<span class="tag warn">⚠ 非必要不選</span>` : '';
+  return `
+  <div class="result-card${isBest ? ' best' : ''}">
+    <div class="card-header">
+      <div>
+        <div class="model-name">${r.model}</div>
+        <div class="model-sub">屋頂式風機 ${r.pole}極 ${r.hp} HP</div>
+      </div>
+      ${badge}
+    </div>
+    <div class="card-body">
+      <div class="spec-grid">
+        <div class="spec-item"><span class="spec-label">需求風量</span><span class="spec-value highlight-value">${Math.round(targetQ)} <span class="unit">CMM</span></span></div>
+        <div class="spec-item"><span class="spec-label">靜壓</span><span class="spec-value">${targetPs} <span class="unit">mmAq</span></span></div>
+        <div class="spec-item"><span class="spec-label">可達風量</span><span class="spec-value">${r.q_avail} <span class="unit">CMM</span></span></div>
+        <div class="spec-item"><span class="spec-label">馬力</span><span class="spec-value">${r.hp} <span class="unit">HP</span></span></div>
+      </div>
+      <div class="tags" style="margin-top:10px">${marginTag}${warnTag}</div>
+    </div>
+  </div>`;
+}
+
+function displayHrResults(results, targetQ, targetPs, best) {
+  const section = document.getElementById('results-section');
+  const container = document.getElementById('results');
+  section.style.display = 'block';
+  document.getElementById('result-count').textContent = results.length;
+  if (results.length === 0) {
+    container.innerHTML = `<div class="no-results"><div class="icon">🔍</div><p>無符合條件的機型</p><p style="margin-top:8px;font-size:12px">請調整風量、靜壓或放寬條件</p></div>`;
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  let html = '';
+  if (best) {
+    html += renderHrCard(best, true, targetQ, targetPs);
+    const others = results.filter(r => r !== best);
+    if (others.length > 0) {
+      html += `<div class="section-label">所有符合機型（${results.length} 款）</div>`;
+      html += others.map(r => renderHrCard(r, false, targetQ, targetPs)).join('');
+    }
+  } else {
+    html = results.map(r => renderHrCard(r, false, targetQ, targetPs)).join('');
   }
   container.innerHTML = html;
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -853,7 +1145,9 @@ function clearAll() {
   document.getElementById('pole').value = '';
   document.getElementById('hp_max').value = '';
   document.getElementById('enclosure').value = 'box';
-  document.getElementById('sba_hp_max').value = '';
+  document.getElementById('cent_hp_max').value = '';
+  document.getElementById('rp_hp_max').value = '';
+  document.getElementById('hr_type').value = 'all';
   document.getElementById('results-section').style.display = 'none';
 }
 
