@@ -235,6 +235,71 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
   
+  /* Priority Toggle */
+  .priority-toggle {
+    display: flex;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .toggle-opt {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--sub);
+    background: #fafafa;
+    transition: all 0.15s;
+    gap: 5px;
+    user-select: none;
+  }
+  .toggle-opt:first-child { border-right: 1px solid var(--border); }
+  .toggle-opt input[type="radio"] { display: none; }
+  .toggle-opt.active-cost { background: var(--primary-light); color: var(--primary); font-weight: 700; }
+  .toggle-opt.active-noise { background: #e8f5e9; color: #2e7d32; font-weight: 700; }
+
+  /* Best card */
+  .best-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fff9c4;
+    color: #f57f17;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card-header-best {
+    background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .result-card.alt .card-header { background: #fafafa; border-bottom: 1px solid var(--border); }
+  .result-card.alt .model-name { font-size: 16px; }
+  .alts-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sub);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 16px 0 8px;
+  }
+  /* Noise/cost tags */
+  .tag.noise-high { background: #ffebee; color: #c62828; }
+  .tag.noise-mid-high { background: #fff3e0; color: #e65100; }
+  .tag.noise-mid-low { background: #f9fbe7; color: #558b2f; }
+  .tag.noise-low { background: #e8f5e9; color: #2e7d32; }
+  .tag.cost-tier { background: #e8eaf6; color: #283593; }
+
   @media (min-width: 480px) {
     .field-row { grid-template-columns: 1fr 1fr 1fr; }
     .spec-grid { grid-template-columns: repeat(3, 1fr); }
@@ -292,6 +357,19 @@
         </select>
       </div>
     </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>優先考量</label>
+      <div class="priority-toggle">
+        <label class="toggle-opt active-cost" id="opt-cost">
+          <input type="radio" name="priority" value="cost" checked onchange="updateToggle()">
+          💰 成本優先
+        </label>
+        <label class="toggle-opt" id="opt-noise">
+          <input type="radio" name="priority" value="noise" onchange="updateToggle()">
+          🔇 低噪音優先
+        </label>
+      </div>
+    </div>
     <button class="btn" onclick="runSelect()">開始選型</button>
     <button class="btn-clear" onclick="clearAll()">清除</button>
   </div>
@@ -299,7 +377,7 @@
   <div id="results-section" style="display:none">
     <div class="results-header">
       <h2>選型結果</h2>
-      <span class="count-badge" id="result-count">0</span>
+      <span class="count-badge" id="result-count" style="display:none">0</span>
     </div>
     <div id="results"></div>
   </div>
@@ -348,65 +426,152 @@ function getMaxQ(config, targetPs) {
   return interpolateQ(config.qt, config.ps_max, targetPs);
 }
 
+const SIZES = [560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000];
+const HP_LIST = [1, 2, 3, 5, 7.5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125];
+const POLE_COST = {2: 0, 4: 0, 6: 1, 8: 2};
+const POLE_NOISE = {2: 3, 4: 2, 6: 1, 8: 0}; // 值越小越安靜
+
+function updateToggle() {
+  const v = document.querySelector('input[name="priority"]:checked').value;
+  document.getElementById('opt-cost').className = 'toggle-opt' + (v === 'cost' ? ' active-cost' : '');
+  document.getElementById('opt-noise').className = 'toggle-opt' + (v === 'noise' ? ' active-noise' : '');
+}
+
+function scoreConfig(c, priority) {
+  const sizeRank = SIZES.indexOf(parseInt(c.size));
+  const poleCostRank = POLE_COST[c.pole] ?? 2;
+  const poleNoiseRank = POLE_NOISE[c.pole] ?? 3;
+  const hpRank = Math.max(0, HP_LIST.indexOf(c.hp));
+  if (priority === 'cost') {
+    // 成本優先：機型尺寸 > 極數成本 > HP
+    return sizeRank * 100 + poleCostRank * 10 + hpRank;
+  } else {
+    // 低噪音優先：極數（高極數低RPM）> 機型尺寸 > HP
+    return poleNoiseRank * 100 + sizeRank * 10 + hpRank;
+  }
+}
+
+function noiseInfo(pole) {
+  return ({
+    2: { label: '高噪音', cls: 'noise-high', icon: '📢' },
+    4: { label: '中高噪音', cls: 'noise-mid-high', icon: '🔊' },
+    6: { label: '中低噪音', cls: 'noise-mid-low', icon: '🔉' },
+    8: { label: '低噪音', cls: 'noise-low', icon: '🔇' }
+  })[pole] || { label: '未知', cls: '', icon: '' };
+}
+
+function costTier(size) {
+  const rank = SIZES.indexOf(parseInt(size));
+  return ['低','低','中低','中','中','中','中高','中高','高','高','極高','極高'][rank] || '高';
+}
+
 function runSelect() {
   const q = parseFloat(document.getElementById('q').value);
   const ps = parseFloat(document.getElementById('ps').value);
   const pole = document.getElementById('pole').value;
   const hp_max = document.getElementById('hp_max').value;
-  
-  if (isNaN(q) || isNaN(ps)) {
-    showToast('請輸入風量和靜壓');
-    return;
-  }
-  if (q <= 0 || ps < 0) {
-    showToast('風量必須 > 0，靜壓必須 ≥ 0');
-    return;
-  }
-  
+  const priority = document.querySelector('input[name="priority"]:checked').value;
+
+  if (isNaN(q) || isNaN(ps)) { showToast('請輸入風量和靜壓'); return; }
+  if (q <= 0 || ps < 0) { showToast('風量必須 > 0，靜壓必須 ≥ 0'); return; }
+
   const matched = [];
-  
   for (const [size, configs] of Object.entries(DATA)) {
-    // For each size, find best config per HP/Pole combo
     const seen = new Map();
-    
     for (const cfg of configs) {
-      // Filter by pole
       if (pole && cfg.pole !== parseInt(pole)) continue;
-      // Filter by hp_max
       if (hp_max && cfg.hp > parseFloat(hp_max)) continue;
-      
       const maxQ = getMaxQ(cfg, ps);
       if (maxQ === null || maxQ < q) continue;
-      
       const key = `${cfg.hp}-${cfg.pole}`;
       const prev = seen.get(key);
-      if (!prev || maxQ > prev.maxQ) {
-        seen.set(key, { ...cfg, size, maxQ });
-      }
+      if (!prev || maxQ > prev.maxQ) seen.set(key, { ...cfg, size, maxQ });
     }
-    
-    for (const m of seen.values()) {
-      matched.push(m);
-    }
+    for (const m of seen.values()) matched.push(m);
   }
-  
-  // Sort: by size (mm) then hp
-  matched.sort((a, b) => {
-    if (a.size !== b.size) return parseInt(a.size) - parseInt(b.size);
-    return a.hp - b.hp;
-  });
-  
-  displayResults(matched, q, ps);
+
+  matched.sort((a, b) => scoreConfig(a, priority) - scoreConfig(b, priority));
+  displayResults(matched, q, ps, priority);
 }
 
-function displayResults(results, targetQ, targetPs) {
+function renderCard(r, targetQ, isBest, priority) {
+  const margin = ((r.maxQ - targetQ) / targetQ * 100).toFixed(0);
+  const ni = noiseInfo(r.pole);
+  const ct = costTier(r.size);
+  const marginCls = parseInt(margin) > 20 ? 'tag' : 'tag warn';
+  const bladesTag = r.blades ? `<span class="tag">${r.blades} 葉</span>` : '';
+  const reasonTag = isBest
+    ? (priority === 'cost'
+        ? `<span class="tag cost-tier">最低成本</span>`
+        : `<span class="tag noise-low">最佳靜音</span>`)
+    : '';
+
+  if (isBest) {
+    return `
+    <div class="result-card">
+      <div class="card-header-best">
+        <div>
+          <div class="best-badge">⭐ 最佳推薦</div>
+          <div class="model-name" style="font-size:22px">VAF-${r.size}</div>
+          <div class="model-sub">${r.pole}P · ${r.hp} HP · 直徑 ${r.size}mm</div>
+        </div>
+        <div style="text-align:right;padding-top:4px">
+          <span class="tag ${ni.cls}">${ni.icon} ${ni.label}</span>
+          <div style="font-size:11px;color:var(--sub);margin-top:6px">造價：${ct}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="spec-grid">
+          <div class="spec-item">
+            <span class="spec-label">可達風量</span>
+            <span class="spec-value highlight-value">${Math.round(r.maxQ)} <span class="unit">CMM</span></span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">馬力</span>
+            <span class="spec-value">${r.hp} <span class="unit">HP</span></span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">最大靜壓</span>
+            <span class="spec-value">${r.ps_max} <span class="unit">mmAq</span></span>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="tags">
+          <span class="${marginCls}">餘量 +${margin}%</span>
+          ${bladesTag}
+          ${reasonTag}
+        </div>
+      </div>
+    </div>`;
+  } else {
+    return `
+    <div class="result-card alt">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="model-name">VAF-${r.size}</div>
+          <div class="model-sub">${r.pole}P · ${r.hp} HP</div>
+        </div>
+        <div style="text-align:right">
+          <span class="tag ${ni.cls}" style="font-size:11px">${ni.icon} ${ni.label}</span>
+          <div style="font-size:11px;color:var(--sub);margin-top:4px">造價：${ct}</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding:10px 16px">
+        <div class="tags">
+          <span class="${marginCls}">餘量 +${margin}%</span>
+          <span class="tag" style="background:#f5f5f5;color:#616161">${Math.round(r.maxQ)} CMM · ${r.ps_max} mmAq</span>
+          ${bladesTag}
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+function displayResults(results, targetQ, targetPs, priority) {
   const section = document.getElementById('results-section');
   const container = document.getElementById('results');
-  const countBadge = document.getElementById('result-count');
-  
   section.style.display = 'block';
-  countBadge.textContent = results.length;
-  
+
   if (results.length === 0) {
     container.innerHTML = `
       <div class="no-results">
@@ -416,53 +581,17 @@ function displayResults(results, targetQ, targetPs) {
       </div>`;
     return;
   }
-  
-  container.innerHTML = results.map(r => {
-    const margin = ((r.maxQ - targetQ) / targetQ * 100).toFixed(0);
-    const marginTag = margin > 20 
-      ? `<span class="tag">餘量 +${margin}%</span>`
-      : `<span class="tag warn">餘量 +${margin}%</span>`;
-    const bladesTag = r.blades ? `<span class="tag">${r.blades} 葉</span>` : '';
-    
-    return `
-    <div class="result-card">
-      <div class="card-header">
-        <div>
-          <div class="model-name">VAF-${r.size}</div>
-          <div class="model-sub">直徑 ${r.size}mm 軸流風機</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="spec-grid">
-          <div class="spec-item">
-            <span class="spec-label">最大風量</span>
-            <span class="spec-value highlight-value">${Math.round(r.maxQ)} <span class="unit">CMM</span></span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">馬力</span>
-            <span class="spec-value">${r.hp} <span class="unit">HP</span></span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">極數</span>
-            <span class="spec-value">${r.pole} <span class="unit">P</span></span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">最大靜壓</span>
-            <span class="spec-value">${r.ps_max} <span class="unit">mmAq</span></span>
-          </div>
-        </div>
-        <hr class="divider">
-        <div class="q-ps-row">
-          條件：<strong>${targetQ} CMM @ ${targetPs} mmAq</strong> → 最大可達 <strong>${Math.round(r.maxQ)} CMM</strong>
-        </div>
-        <div class="tags" style="margin-top:10px">
-          ${marginTag}
-          ${bladesTag}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  
+
+  const [best, ...rest] = results;
+  const alts = rest.slice(0, 3);
+
+  let html = renderCard(best, targetQ, true, priority);
+  if (alts.length > 0) {
+    html += `<div class="alts-label">備選方案</div>`;
+    html += alts.map(r => renderCard(r, targetQ, false, priority)).join('');
+  }
+
+  container.innerHTML = html;
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
