@@ -407,9 +407,9 @@ function runSelect() {
     return a.hp - b.hp;
   });
 
-  // 未限定馬力與極數時，依公式計算最小需求 HP，再從符合機型中取最低合規 HP
+  // 至少有一個維度未限定時，依公式計算最小需求 HP，再從符合機型中取最低合規 HP
   let bestResult = null;
-  if (!pole && !hp_max) {
+  if (!pole || !hp_max) {
     const motorTable = [
       {hp:1,kw:0.75},{hp:2,kw:1.5},{hp:3,kw:2.2},{hp:5,kw:3.7},
       {hp:7.5,kw:5.5},{hp:10,kw:7.5},{hp:15,kw:11},{hp:20,kw:15},
