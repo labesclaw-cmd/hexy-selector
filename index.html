@@ -262,7 +262,7 @@
   
   @media (min-width: 480px) {
     .field-row { grid-template-columns: 1fr 1fr 1fr; }
-    .spec-grid { grid-template-columns: repeat(3, 1fr); }
+    .spec-grid { grid-template-columns: repeat(4, 1fr); }
   }
 </style>
 </head>
@@ -495,8 +495,12 @@ function displayResults(results, targetQ, targetPs) {
       <div class="card-body">
         <div class="spec-grid">
           <div class="spec-item">
-            <span class="spec-label">最大風量</span>
-            <span class="spec-value highlight-value">${Math.round(r.maxQ)} <span class="unit">CMM</span></span>
+            <span class="spec-label">需求風量</span>
+            <span class="spec-value highlight-value">${Math.round(targetQ)} <span class="unit">CMM</span></span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">靜壓</span>
+            <span class="spec-value">${targetPs} <span class="unit">mmAq</span></span>
           </div>
           <div class="spec-item">
             <span class="spec-label">馬力</span>
@@ -507,11 +511,7 @@ function displayResults(results, targetQ, targetPs) {
             <span class="spec-value">${r.pole} <span class="unit">P</span></span>
           </div>
         </div>
-        <hr class="divider">
-        <div class="q-ps-row">
-          條件：<strong>${targetQ} CMM @ ${targetPs} mmAq</strong> → 最大可達 <strong>${Math.round(r.maxQ)} CMM</strong>
-        </div>
-        <div class="tags" style="margin-top:10px">
+        <div class="tags" style="margin-top:12px">
           ${marginTag}
           ${extraTag}
           ${bladesTag}
