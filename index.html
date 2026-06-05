@@ -212,6 +212,12 @@
     border-radius: 20px; padding: 3px 10px;
     font-size: 12px; font-weight: 600; white-space: nowrap;
   }
+  .section-label {
+    font-size: 12px; font-weight: 600; color: var(--sub);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin: 16px 0 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
   .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
   
@@ -433,8 +439,7 @@ function displayResults(results, targetQ, targetPs, bestResult) {
     return;
   }
 
-  container.innerHTML = results.map(r => {
-    const isBest = bestResult && r === bestResult;
+  function renderCard(r, isBest) {
     const margin = ((r.maxQ - targetQ) / targetQ * 100).toFixed(0);
     const marginTag = margin > 20
       ? `<span class="tag">餘量 +${margin}%</span>`
@@ -479,7 +484,20 @@ function displayResults(results, targetQ, targetPs, bestResult) {
         </div>
       </div>
     </div>`;
-  }).join('');
+  }
+
+  let html = '';
+  if (bestResult) {
+    html += renderCard(bestResult, true);
+    const others = results.filter(r => r !== bestResult);
+    if (others.length > 0) {
+      html += `<div class="section-label">所有符合機型（${results.length} 款）</div>`;
+      html += others.map(r => renderCard(r, false)).join('');
+    }
+  } else {
+    html = results.map(r => renderCard(r, false)).join('');
+  }
+  container.innerHTML = html;
 
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
