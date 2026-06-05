@@ -494,7 +494,7 @@ function runSelect() {
   displayResults(matched, q, ps, priority);
 }
 
-function renderCard(r, targetQ, isBest, priority) {
+function renderCard(r, targetQ, targetPs, isBest, priority) {
   const margin = ((r.maxQ - targetQ) / targetQ * 100).toFixed(0);
   const ni = noiseInfo(r.pole);
   const ct = costTier(r.size);
@@ -525,7 +525,7 @@ function renderCard(r, targetQ, isBest, priority) {
           <div class="spec-item">
             <span class="spec-label">需求風量</span>
             <span class="spec-value highlight-value">${Math.round(targetQ)} <span class="unit">CMM</span></span>
-            <span style="font-size:11px;color:var(--sub);margin-top:2px">可達 ${Math.round(r.maxQ)} CMM</span>
+            <span style="font-size:11px;color:var(--sub);margin-top:2px">可達 ${Math.round(r.maxQ)} CMM @ ${targetPs} mmAq</span>
           </div>
           <div class="spec-item">
             <span class="spec-label">馬力</span>
@@ -561,7 +561,7 @@ function renderCard(r, targetQ, isBest, priority) {
           <div class="spec-item">
             <span class="spec-label">需求風量</span>
             <span class="spec-value highlight-value">${Math.round(targetQ)} <span class="unit">CMM</span></span>
-            <span style="font-size:11px;color:var(--sub);margin-top:2px">可達 ${Math.round(r.maxQ)} CMM</span>
+            <span style="font-size:11px;color:var(--sub);margin-top:2px">可達 ${Math.round(r.maxQ)} CMM @ ${targetPs} mmAq</span>
           </div>
           <div class="spec-item">
             <span class="spec-label">馬力</span>
@@ -599,10 +599,10 @@ function displayResults(results, targetQ, targetPs, priority) {
   const [best, ...rest] = results;
   const alts = rest.slice(0, 3);
 
-  let html = renderCard(best, targetQ, true, priority);
+  let html = renderCard(best, targetQ, targetPs, true, priority);
   if (alts.length > 0) {
     html += `<div class="alts-label">備選方案</div>`;
-    html += alts.map(r => renderCard(r, targetQ, false, priority)).join('');
+    html += alts.map(r => renderCard(r, targetQ, targetPs, false, priority)).join('');
   }
 
   container.innerHTML = html;
