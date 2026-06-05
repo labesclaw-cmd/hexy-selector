@@ -523,21 +523,21 @@ function renderCard(r, targetQ, isBest, priority) {
       <div class="card-body">
         <div class="spec-grid">
           <div class="spec-item">
-            <span class="spec-label">可達風量</span>
-            <span class="spec-value highlight-value">${Math.round(r.maxQ)} <span class="unit">CMM</span></span>
+            <span class="spec-label">需求風量</span>
+            <span class="spec-value highlight-value">${Math.round(targetQ)} <span class="unit">CMM</span></span>
+            <span style="font-size:11px;color:var(--sub);margin-top:2px">可達 ${Math.round(r.maxQ)} CMM</span>
           </div>
           <div class="spec-item">
             <span class="spec-label">馬力</span>
             <span class="spec-value">${r.hp} <span class="unit">HP</span></span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">最大靜壓</span>
-            <span class="spec-value">${r.ps_max} <span class="unit">mmAq</span></span>
+            <span class="spec-label">餘量</span>
+            <span class="spec-value">${margin} <span class="unit">%</span></span>
           </div>
         </div>
         <hr class="divider">
         <div class="tags">
-          <span class="${marginCls}">餘量 +${margin}%</span>
           ${bladesTag}
           ${reasonTag}
         </div>
@@ -559,21 +559,21 @@ function renderCard(r, targetQ, isBest, priority) {
       <div class="card-body" style="padding:12px 16px">
         <div class="spec-grid">
           <div class="spec-item">
-            <span class="spec-label">可達風量</span>
-            <span class="spec-value highlight-value">${Math.round(r.maxQ)} <span class="unit">CMM</span></span>
+            <span class="spec-label">需求風量</span>
+            <span class="spec-value highlight-value">${Math.round(targetQ)} <span class="unit">CMM</span></span>
+            <span style="font-size:11px;color:var(--sub);margin-top:2px">可達 ${Math.round(r.maxQ)} CMM</span>
           </div>
           <div class="spec-item">
             <span class="spec-label">馬力</span>
             <span class="spec-value">${r.hp} <span class="unit">HP</span></span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">最大靜壓</span>
-            <span class="spec-value">${r.ps_max} <span class="unit">mmAq</span></span>
+            <span class="spec-label">餘量</span>
+            <span class="spec-value">${margin} <span class="unit">%</span></span>
           </div>
         </div>
         <hr class="divider">
         <div class="tags">
-          <span class="${marginCls}">餘量 +${margin}%</span>
           ${bladesTag}
         </div>
       </div>
