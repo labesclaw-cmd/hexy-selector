@@ -344,37 +344,37 @@
         </select>
       </div>
       <div class="field">
-        <label>HP 上限</label>
+        <label>HP 指定</label>
         <select id="cent_hp_max">
           <option value="">不限</option>
-          <option value="0.5">≤ 0.5 HP</option>
-          <option value="1">≤ 1 HP</option>
-          <option value="2">≤ 2 HP</option>
-          <option value="3">≤ 3 HP</option>
-          <option value="5">≤ 5 HP</option>
-          <option value="7.5">≤ 7.5 HP</option>
-          <option value="10">≤ 10 HP</option>
-          <option value="15">≤ 15 HP</option>
-          <option value="20">≤ 20 HP</option>
-          <option value="25">≤ 25 HP</option>
-          <option value="30">≤ 30 HP</option>
-          <option value="40">≤ 40 HP</option>
-          <option value="50">≤ 50 HP</option>
+          <option value="0.5">0.5 HP</option>
+          <option value="1">1 HP</option>
+          <option value="2">2 HP</option>
+          <option value="3">3 HP</option>
+          <option value="5">5 HP</option>
+          <option value="7.5">7.5 HP</option>
+          <option value="10">10 HP</option>
+          <option value="15">15 HP</option>
+          <option value="20">20 HP</option>
+          <option value="25">25 HP</option>
+          <option value="30">30 HP</option>
+          <option value="40">40 HP</option>
+          <option value="50">50 HP</option>
         </select>
       </div>
     </div>
     <!-- RP options -->
     <div class="options-row single" id="rp-options">
       <div class="field">
-        <label>HP 上限</label>
+        <label>HP 指定</label>
         <select id="rp_hp_max">
           <option value="">不限</option>
-          <option value="1">≤ 1 HP</option>
-          <option value="2">≤ 2 HP</option>
-          <option value="3">≤ 3 HP</option>
-          <option value="5">≤ 5 HP</option>
-          <option value="7.5">≤ 7.5 HP</option>
-          <option value="10">≤ 10 HP</option>
+          <option value="1">1 HP</option>
+          <option value="2">2 HP</option>
+          <option value="3">3 HP</option>
+          <option value="5">5 HP</option>
+          <option value="7.5">7.5 HP</option>
+          <option value="10">10 HP</option>
         </select>
       </div>
     </div>
@@ -776,12 +776,7 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES) {
     if (!motor) continue;
     results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, hp: motor.hp, HP_calc, r });
   }
-  const best = results.reduce((b, r) => {
-    if (!b) return r;
-    if (r.hp < b.hp) return r;
-    if (r.hp === b.hp && parseInt(r.size) < parseInt(b.size)) return r;
-    return b;
-  }, null);
+  const best = results[0] || null;
   return { results, best };
 }
 
@@ -878,8 +873,8 @@ function runSelect() {
     const rp_hp_max = document.getElementById('rp_hp_max').value;
     let { results, best } = centrifugalSelect(q, ps, 0.5, RP_BASES, RP_SIZES);
     if (rp_hp_max) {
-      results = results.filter(r => r.hp <= parseFloat(rp_hp_max));
-      if (best && best.hp > parseFloat(rp_hp_max)) best = results[0] || null;
+      results = results.filter(r => r.hp === parseFloat(rp_hp_max));
+      best = results[0] || null;
     }
     displayCentrifugalResults(results, q, ps, best, 'RP', '無殼式離心風機');
     return;
@@ -896,8 +891,8 @@ function runSelect() {
     const [BASES, SIZES, prefix, desc] = MAP[type];
     let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES);
     if (cent_hp_max) {
-      results = results.filter(r => r.hp <= parseFloat(cent_hp_max));
-      if (best && best.hp > parseFloat(cent_hp_max)) best = results[0] || null;
+      results = results.filter(r => r.hp === parseFloat(cent_hp_max));
+      best = results[0] || null;
     }
     displayCentrifugalResults(results, q, ps, best, prefix, desc);
     return;
