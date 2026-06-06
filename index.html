@@ -250,7 +250,7 @@
   /* Options rows */
   .options-row { display: none; gap: 12px; margin-bottom: 12px; }
   .options-row.visible { display: grid; grid-template-columns: 1fr 1fr; }
-  .options-row.single.visible { grid-template-columns: 1fr 1fr; }
+  .options-row.single.visible { grid-template-columns: 1fr; }
 
   /* Bottom Tab Bar */
   .bottom-tabs {
@@ -278,6 +278,7 @@
 
   @media (min-width: 480px) {
     .field-row { grid-template-columns: 1fr 1fr 1fr; }
+    .options-row.visible { grid-template-columns: 1fr 1fr 1fr; }
     .spec-grid { grid-template-columns: repeat(4, 1fr); }
     .tab-item { font-size: 10px; }
   }
