@@ -249,8 +249,8 @@
   
   /* Options rows */
   .options-row { display: none; gap: 12px; margin-bottom: 12px; }
-  .options-row.visible { display: flex; flex-wrap: wrap; }
-  .options-row .field { min-width: 110px; max-width: 160px; }
+  .options-row.visible { display: grid; grid-template-columns: 1fr 1fr; }
+  .options-row.single.visible { grid-template-columns: 1fr 1fr; }
 
   /* Bottom Tab Bar */
   .bottom-tabs {
