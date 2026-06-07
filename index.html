@@ -874,7 +874,7 @@ function runSelect() {
 
   if (type === 'rp') {
     const rp_hp_max = document.getElementById('rp_hp_max').value;
-    let { results, best } = centrifugalSelect(q, ps, 0.5, RP_BASES, RP_SIZES);
+    let { results, best } = centrifugalSelect(q, ps, 0.5, RP_BASES, RP_SIZES, 54);
     if (rp_hp_max) {
       results = results.filter(r => r.hp === parseFloat(rp_hp_max));
       best = results[0] || null;
@@ -892,7 +892,8 @@ function runSelect() {
       hbs: [HBS_BASES, HBS_SIZES, 'HBS', '單吸前傾離心風機']
     };
     const [BASES, SIZES, prefix, desc] = MAP[type];
-    const tipLimit = type === 'hbs' ? Infinity : 50;
+    const tipLimits = { sba: Infinity, rba: 50, hbs: 60 };
+    const tipLimit = tipLimits[type] ?? 50;
     let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit);
     if (cent_hp_max) {
       results = results.filter(r => r.hp === parseFloat(cent_hp_max));
