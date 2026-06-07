@@ -449,7 +449,7 @@ const PS_POINTS = [0, 10, 20, 30, 40, 50, 60, 80, 100];
 // SBA 基準曲線（各型號在 N_base RPM 下的測試數據）
 const SBA_BASES = {
   "250": {
-    D_imp: 250, N_base: 1300,
+    D_imp: 260, N_base: 1300,
     pts: [
       {Q:140.64, Ps:0,      Pt:32.551, P:2.559},
       {Q:128.4,  Ps:11.224, Pt:38.367, P:2.215},
@@ -462,7 +462,7 @@ const SBA_BASES = {
     ]
   },
   "280": {
-    D_imp: 280, N_base: 1200,
+    D_imp: 290, N_base: 1200,
     pts: [
       {Q:183.66, Ps:0,      Pt:34.286, P:4.084},
       {Q:168.9,  Ps:12.857, Pt:41.837, P:3.538},
@@ -475,7 +475,7 @@ const SBA_BASES = {
     ]
   },
   "400": {
-    D_imp: 400, N_base: 1000,
+    D_imp: 408, N_base: 1000,
     pts: [
       {Q:415.44, Ps:0,      Pt:45.306, P:12.588},
       {Q:381.24, Ps:26.429, Pt:64.490, P:10.803},
@@ -488,7 +488,7 @@ const SBA_BASES = {
     ]
   },
   "560": {
-    D_imp: 560, N_base: 600,
+    D_imp: 565, N_base: 600,
     pts: [
       {Q:722.04, Ps:0,      Pt:34.694, P:14.244},
       {Q:644.58, Ps:17.245, Pt:44.898, P:11.725},
@@ -501,7 +501,7 @@ const SBA_BASES = {
     ]
   },
   "800": {
-    D_imp: 800, N_base: 250,
+    D_imp: 810, N_base: 250,
     pts: [
       {Q:717.6,  Ps:0,      Pt:8.673,  P:4.812},
       {Q:654.54, Ps:11.429, Pt:18.673, P:3.986},
@@ -517,24 +517,24 @@ const SBA_BASES = {
 
 // SBA 尺寸表：D_imp=葉輪直徑(mm), base=對應基準型號, N_max=最高轉速, min_hp=最小推薦馬力
 const SBA_SIZES = [
-  {size:"250",  D_imp:250,  base:"250", N_max:1836, min_hp:0.5},
-  {size:"280",  D_imp:280,  base:"280", N_max:1646, min_hp:0.5},
-  {size:"315",  D_imp:315,  base:"250", N_max:1469, min_hp:1},
-  {size:"355",  D_imp:355,  base:"280", N_max:1319, min_hp:1},
-  {size:"400",  D_imp:400,  base:"400", N_max:1170, min_hp:1},
-  {size:"450",  D_imp:450,  base:"400", N_max:1038, min_hp:2},
-  {size:"500",  D_imp:500,  base:"400", N_max:933,  min_hp:2},
-  {size:"560",  D_imp:560,  base:"560", N_max:845,  min_hp:2},
-  {size:"630",  D_imp:630,  base:"560", N_max:750,  min_hp:3},
-  {size:"710",  D_imp:710,  base:"560", N_max:668,  min_hp:3},
-  {size:"800",  D_imp:800,  base:"800", N_max:589,  min_hp:5},
-  {size:"900",  D_imp:900,  base:"800", N_max:524,  min_hp:5},
-  {size:"1000", D_imp:1000, base:"800", N_max:470,  min_hp:5}
+  {size:"250",  D_imp:260,  base:"250", N_max:1836, min_hp:0.5},
+  {size:"280",  D_imp:290,  base:"280", N_max:1646, min_hp:0.5},
+  {size:"315",  D_imp:325,  base:"250", N_max:1469, min_hp:1},
+  {size:"355",  D_imp:362,  base:"280", N_max:1319, min_hp:1},
+  {size:"400",  D_imp:408,  base:"400", N_max:1170, min_hp:1},
+  {size:"450",  D_imp:460,  base:"400", N_max:1038, min_hp:2},
+  {size:"500",  D_imp:512,  base:"400", N_max:933,  min_hp:2},
+  {size:"560",  D_imp:565,  base:"560", N_max:845,  min_hp:2},
+  {size:"630",  D_imp:637,  base:"560", N_max:750,  min_hp:3},
+  {size:"710",  D_imp:715,  base:"560", N_max:668,  min_hp:3},
+  {size:"800",  D_imp:810,  base:"800", N_max:589,  min_hp:5},
+  {size:"900",  D_imp:912,  base:"800", N_max:524,  min_hp:5},
+  {size:"1000", D_imp:1015, base:"800", N_max:470,  min_hp:5}
 ];
 
 // RBA 雙吸後傾離心風機
 const RBA_BASES = {
-  "315": { D_imp:315, N_base:2000, pts:[
+  "315": { D_imp:325, N_base:2000, pts:[
     {Q:108.78,Ps:0,      Pt:7.449,  P:0.927},
     {Q:100.20,Ps:11.735, Pt:18.061, P:0.951},
     {Q:89.10, Ps:25.510, Pt:30.408, P:0.954},
@@ -544,7 +544,7 @@ const RBA_BASES = {
     {Q:31.92, Ps:71.633, Pt:72.347, P:0.701},
     {Q:18.06, Ps:72.755, Pt:72.959, P:0.567}
   ]},
-  "400": { D_imp:400, N_base:2000, pts:[
+  "400": { D_imp:412, N_base:2000, pts:[
     {Q:257.46,Ps:0,       Pt:17.143, P:3.953},
     {Q:234.54,Ps:26.327,  Pt:40.510, P:4.039},
     {Q:201.60,Ps:44.286,  Pt:54.796, P:3.627},
@@ -555,7 +555,7 @@ const RBA_BASES = {
     {Q:81.96, Ps:117.449, Pt:119.184,P:2.532},
     {Q:41.10, Ps:122.449, Pt:122.959,P:1.902}
   ]},
-  "450": { D_imp:450, N_base:1800, pts:[
+  "450": { D_imp:462, N_base:1800, pts:[
     {Q:332.04,Ps:0,       Pt:18.061, P:5.153},
     {Q:306.06,Ps:20.816,  Pt:36.020, P:5.141},
     {Q:277.02,Ps:42.347,  Pt:54.796, P:5.073},
@@ -566,7 +566,7 @@ const RBA_BASES = {
     {Q:95.10, Ps:123.571, Pt:125.0,  P:3.192},
     {Q:75.84, Ps:124.898, Pt:125.816,P:2.778}
   ]},
-  "630": { D_imp:630, N_base:1200, pts:[
+  "630": { D_imp:649, N_base:1200, pts:[
     {Q:623.52,Ps:0,       Pt:16.122, P:7.897},
     {Q:567.06,Ps:27.143,  Pt:40.408, P:8.258},
     {Q:486.54,Ps:50.408,  Pt:60.204, P:7.888},
@@ -579,26 +579,35 @@ const RBA_BASES = {
   ]}
 };
 const RBA_SIZES = [
-  {size:"315", D_imp:315,  base:"315", N_max:3526, min_hp:1},
-  {size:"355", D_imp:355,  base:"315", N_max:3139, min_hp:1},
-  {size:"400", D_imp:400,  base:"400", N_max:2781, min_hp:1},
-  {size:"450", D_imp:450,  base:"450", N_max:2480, min_hp:2},
-  {size:"500", D_imp:500,  base:"450", N_max:2204, min_hp:2},
-  {size:"560", D_imp:560,  base:"450", N_max:1976, min_hp:3},
-  {size:"630", D_imp:630,  base:"630", N_max:1766, min_hp:3},
-  {size:"710", D_imp:710,  base:"630", N_max:1578, min_hp:5},
-  {size:"800", D_imp:800,  base:"630", N_max:1397, min_hp:7.5},
-  {size:"900", D_imp:900,  base:"630", N_max:1259, min_hp:7.5},
-  {size:"1000",D_imp:1000, base:"630", N_max:1123, min_hp:10},
-  {size:"1120",D_imp:1120, base:"630", N_max:1010, min_hp:20},
-  {size:"1250",D_imp:1250, base:"630", N_max:909,  min_hp:20},
-  {size:"1400",D_imp:1400, base:"630", N_max:807,  min_hp:25},
-  {size:"1600",D_imp:1600, base:"630", N_max:707,  min_hp:25}
+  {size:"315", D_imp:325,  base:"315", N_max:3408, min_hp:1},
+  {size:"355", D_imp:365,  base:"315", N_max:3035, min_hp:1},
+  {size:"400", D_imp:412,  base:"400", N_max:2689, min_hp:1},
+  {size:"450", D_imp:462,  base:"450", N_max:2398, min_hp:2},
+  {size:"500", D_imp:520,  base:"450", N_max:2130, min_hp:2},
+  {size:"560", D_imp:580,  base:"450", N_max:1910, min_hp:3},
+  {size:"630", D_imp:649,  base:"630", N_max:1707, min_hp:3},
+  {size:"710", D_imp:726,  base:"630", N_max:1526, min_hp:5},
+  {size:"800", D_imp:820,  base:"630", N_max:1351, min_hp:7.5},
+  {size:"900", D_imp:910,  base:"630", N_max:1217, min_hp:7.5},
+  {size:"1000",D_imp:1020, base:"630", N_max:1086, min_hp:10},
+  {size:"1120",D_imp:1135, base:"630", N_max:976,  min_hp:20},
+  {size:"1250",D_imp:1260, base:"630", N_max:879,  min_hp:20},
+  {size:"1400",D_imp:1420, base:"630", N_max:780,  min_hp:25},
+  {size:"1600",D_imp:1620, base:"630", N_max:684,  min_hp:25}
 ];
 
 // HBS 單吸前傾離心風機
 const HBS_BASES = {
-  "450": { D_imp:450, N_base:1761, pts:[
+  "315": { D_imp:315, N_base:2756, pts:[
+    {Q:71.36, Ps:0.51,  Pt:13.13,  P:1.695},
+    {Q:61.93, Ps:39.22, Pt:48.52,  P:1.687},
+    {Q:51.63, Ps:55.38, Pt:61.91,  P:1.562},
+    {Q:42.79, Ps:78.83, Pt:83.25,  P:1.489},
+    {Q:29.17, Ps:101.67,Pt:103.66, P:1.325},
+    {Q:22.29, Ps:132.93,Pt:134.12, P:1.192},
+    {Q:12.89, Ps:140.92,Pt:141.31, P:0.974}
+  ]},
+  "450": { D_imp:450, N_base:1766, pts:[
     {Q:140,Ps:0.1,  Pt:11.9, P:2.2},
     {Q:120,Ps:30.9, Pt:39.6, P:2.2},
     {Q:98, Ps:61.4, Pt:67.1, P:2.0},
@@ -607,7 +616,7 @@ const HBS_BASES = {
     {Q:43, Ps:100.1,Pt:101.2,P:1.6},
     {Q:20, Ps:105.5,Pt:105.7,P:1.2}
   ]},
-  "560": { D_imp:560, N_base:1474, pts:[
+  "560": { D_imp:560, N_base:1481, pts:[
     {Q:198,Ps:0.3,  Pt:14.1, P:3.7},
     {Q:172,Ps:28.6, Pt:38.9, P:3.5},
     {Q:142,Ps:61.7, Pt:68.8, P:3.3},
@@ -658,8 +667,8 @@ const HBS_BASES = {
   ]}
 };
 const HBS_SIZES = [
-  {size:"315", D_imp:315,  base:"450",  N_max:3880, min_hp:1},
-  {size:"355", D_imp:355,  base:"450",  N_max:3443, min_hp:1},
+  {size:"315", D_imp:315,  base:"315",  N_max:3880, min_hp:1},
+  {size:"355", D_imp:355,  base:"315",  N_max:3443, min_hp:1},
   {size:"400", D_imp:400,  base:"450",  N_max:3056, min_hp:1},
   {size:"450", D_imp:450,  base:"450",  N_max:2716, min_hp:1},
   {size:"500", D_imp:500,  base:"450",  N_max:2445, min_hp:2},
