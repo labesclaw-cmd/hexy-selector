@@ -850,7 +850,7 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50, 
     if (N_model > sz.N_max || N_model < 1) continue;
     const P_shaft = pt1.P + (pt2.P - pt1.P) * (Q_base_star - pt1.Q) / (pt2.Q - pt1.Q);
     const P_model = P_shaft * Math.pow(N_model / base.N_base, 3) * r5;
-    const HP_calc = P_model / 0.746;
+    const HP_calc = P_model / 0.746 / 0.98;
     const motor = MOTOR_TABLE.find(m => m.hp >= Math.max(sz.min_hp, HP_calc));
     if (!motor) continue;
     const vTip = Math.PI * (sz.D_imp / 1000) * N_model / 60;
