@@ -336,7 +336,7 @@
     </div>
     <!-- SBA/RBA/HBS options -->
     <div class="options-row" id="centrifugal-options">
-      <div class="field">
+      <div class="field" id="enclosure-field">
         <label>安裝形式</label>
         <select id="enclosure">
           <option value="box">箱型（f=2）</option>
@@ -731,6 +731,7 @@ function setFanType(type) {
     document.getElementById('tab-'+t).classList.toggle('active', t === type));
   document.getElementById('vaf-options').classList.toggle('visible', type === 'vaf');
   document.getElementById('centrifugal-options').classList.toggle('visible', ['sba','rba','hbs'].includes(type));
+  document.getElementById('enclosure-field').style.display = type === 'hbs' ? 'none' : '';
   document.getElementById('rp-options').classList.toggle('visible', type === 'rp');
   document.getElementById('hr-options').classList.toggle('visible', type === 'hr');
   const titles = {
@@ -883,7 +884,7 @@ function runSelect() {
   }
 
   if (['sba','rba','hbs'].includes(type)) {
-    const f = document.getElementById('enclosure').value === 'box' ? 2 : 0.5;
+    const f = type === 'hbs' ? 0 : (document.getElementById('enclosure').value === 'box' ? 2 : 0.5);
     const cent_hp_max = document.getElementById('cent_hp_max').value;
     const MAP = {
       sba: [SBA_BASES, SBA_SIZES, 'SBA', '前傾式離心風機'],
