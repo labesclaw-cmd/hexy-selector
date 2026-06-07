@@ -934,7 +934,8 @@ function runSelect() {
     let { results, best } = centrifugalSelect(q, ps, rp_f, RP_BASES, RP_SIZES, 54);
     if (rp_hp_max) {
       results = results.filter(r => r.hp === parseFloat(rp_hp_max));
-      best = results[0] || null;
+      const tipOkRp = results.filter(r => r.tipOk);
+      best = (tipOkRp.length > 0 ? tipOkRp : results)[0] || null;
     }
     displayCentrifugalResults(results, q, ps, best, 'RP', '無殼式離心風機');
     return;
@@ -954,7 +955,13 @@ function runSelect() {
     let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit);
     if (cent_hp_max) {
       results = results.filter(r => r.hp === parseFloat(cent_hp_max));
-      best = results[0] || null;
+      const tipOkCent = results.filter(r => r.tipOk);
+      best = (tipOkCent.length > 0 ? tipOkCent : results)[0] || null;
+    } else if (type === 'hbs') {
+      const sortBySize = (a, b) => parseInt(a.size) - parseInt(b.size);
+      const okHbs = results.filter(r => r.tipOk).sort(sortBySize);
+      results.sort(sortBySize);
+      best = (okHbs.length > 0 ? okHbs : results)[0] || null;
     }
     displayCentrifugalResults(results, q, ps, best, prefix, desc);
     return;
