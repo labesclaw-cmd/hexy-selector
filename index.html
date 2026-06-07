@@ -749,6 +749,30 @@ const MOTOR_TABLE = [
   {hp:60,kw:45},{hp:75,kw:55},{hp:100,kw:75},{hp:125,kw:90}
 ];
 
+// 出口面積 (m²) — from kusen.xlsx VLOOKUP table (col J)
+const SBA_OUTLET_AREA = {
+  '250':0.104329,'280':0.131044,'315':0.164025,'355':0.206116,
+  '400':0.256036,'450':0.323761,'500':0.407044,'560':0.508369,
+  '630':0.64,'710':0.806404,'800':1.010025,'900':1.2769,'1000':1.605289
+};
+const RBA_OUTLET_AREA = {
+  '315':0.162409,'355':0.205209,'400':0.255025,'450':0.319225,
+  '500':0.403225,'560':0.50765,'630':0.64,'710':0.801025,
+  '800':1.010025,'900':1.265625,'1000':1.5876,'1120':1.9881,
+  '1250':2.3716,'1400':3.115225,'1600':4.048144
+};
+const HBS_OUTLET_AREA = {
+  '315':0.07441875,'355':0.09451875,'400':0.12,'450':0.151875,
+  '500':0.1875,'560':0.2156,'630':0.27286875,'710':0.34656875,
+  '800':0.44,'900':0.594,'1000':0.75,'1120':0.9408,
+  '1250':1.171875,'1400':1.47,'1600':1.92,'1800':2.345679
+};
+const RP_OUTLET_AREA = {
+  '560':0.35,'630':0.44124346,'710':0.544,'800':0.6885,
+  '900':0.868994,'1000':1.070475,'1120':1.339957,
+  '1250':1.666,'1400':2.115975
+};
+
 let currentFanType = 'vaf';
 
 function setFanType(type) {
@@ -799,7 +823,7 @@ function polyFitP(pts, q) {
 }
 
 // Shared centrifugal fan algorithm (quadratic intersection, matches Excel v3.2)
-function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50) {
+function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50, OUTLET_AREA = {}, exitLimit = Infinity) {
   const results = [];
   for (const sz of SIZES) {
     const base = BASES[sz.base];
@@ -830,12 +854,16 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50) 
     const motor = MOTOR_TABLE.find(m => m.hp >= Math.max(sz.min_hp, HP_calc));
     if (!motor) continue;
     const vTip = Math.PI * (sz.D_imp / 1000) * N_model / 60;
-    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, vTip, tipOk: vTip <= tipLimit, hp: motor.hp, HP_calc, r });
+    const tipOk = vTip <= tipLimit;
+    const outletArea = OUTLET_AREA[sz.size];
+    const v_exit = outletArea ? (q_target / 60 / outletArea) : 0;
+    const exitOk = v_exit <= exitLimit;
+    if (!tipOk || !exitOk) continue;
+    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, vTip, tipOk, hp: motor.hp, HP_calc, r, v_exit, exitOk });
   }
   const sortByHpSize = (a, b) => a.hp - b.hp || parseInt(a.size) - parseInt(b.size);
-  const okResults = results.filter(r => r.tipOk).sort(sortByHpSize);
   results.sort(sortByHpSize);
-  const best = (okResults.length > 0 ? okResults : results)[0] || null;
+  const best = results[0] || null;
   return { results, best };
 }
 
@@ -931,11 +959,10 @@ function runSelect() {
   if (type === 'rp') {
     const rp_hp_max = document.getElementById('rp_hp_max').value;
     const rp_f = document.getElementById('rp_enclosure').value === 'box' ? 0.5 : 0;
-    let { results, best } = centrifugalSelect(q, ps, rp_f, RP_BASES, RP_SIZES, 54);
+    let { results, best } = centrifugalSelect(q, ps, rp_f, RP_BASES, RP_SIZES, 54, RP_OUTLET_AREA, 20);
     if (rp_hp_max) {
       results = results.filter(r => r.hp === parseFloat(rp_hp_max));
-      const tipOkRp = results.filter(r => r.tipOk);
-      best = (tipOkRp.length > 0 ? tipOkRp : results)[0] || null;
+      best = results[0] || null;
     }
     displayCentrifugalResults(results, q, ps, best, 'RP', '無殼式離心風機');
     return;
@@ -951,17 +978,19 @@ function runSelect() {
     };
     const [BASES, SIZES, prefix, desc] = MAP[type];
     const tipLimits = { sba: Infinity, rba: 50, hbs: 60 };
+    const exitLimits = { sba: 18, rba: 16, hbs: 18 };
+    const outletAreas = { sba: SBA_OUTLET_AREA, rba: RBA_OUTLET_AREA, hbs: HBS_OUTLET_AREA };
     const tipLimit = tipLimits[type] ?? 50;
-    let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit);
+    const exitLimit = exitLimits[type] ?? Infinity;
+    const OUTLET_AREA = outletAreas[type] ?? {};
+    let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit, OUTLET_AREA, exitLimit);
     if (cent_hp_max) {
       results = results.filter(r => r.hp === parseFloat(cent_hp_max));
-      const tipOkCent = results.filter(r => r.tipOk);
-      best = (tipOkCent.length > 0 ? tipOkCent : results)[0] || null;
+      best = results[0] || null;
     } else if (type === 'hbs') {
       const sortBySize = (a, b) => parseInt(a.size) - parseInt(b.size);
-      const okHbs = results.filter(r => r.tipOk).sort(sortBySize);
       results.sort(sortBySize);
-      best = (okHbs.length > 0 ? okHbs : results)[0] || null;
+      best = results[0] || null;
     }
     displayCentrifugalResults(results, q, ps, best, prefix, desc);
     return;
@@ -1003,10 +1032,10 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs) {
   const badge = isBest ? `<span class="best-badge">✦ 最佳選擇</span>` : '';
   const speedPct = Math.round(r.N_rpm / r.N_max * 100);
   const vTipStr = r.vTip ? r.vTip.toFixed(1) : '?';
-  const speedTag = r.tipOk
-    ? `<span class="tag">轉速 ${speedPct}%</span>`
-    : `<span class="tag warn">超過選機轉速</span>`;
+  const vExitStr = r.v_exit != null ? r.v_exit.toFixed(1) : '?';
+  const speedTag = `<span class="tag">轉速 ${speedPct}%</span>`;
   const hpTag = `<span class="tag">計算 ${r.HP_calc.toFixed(2)} HP</span>`;
+  const exitTag = `<span class="tag">出口風速 ${vExitStr} m/s</span>`;
   return `
   <div class="result-card${isBest ? ' best' : ''}">
     <div class="card-header">
@@ -1040,7 +1069,7 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs) {
         切線速度 <strong>${vTipStr} m/s</strong>　最高轉速 <strong>${r.N_max} RPM</strong>
       </div>
       <div class="tags" style="margin-top:10px">
-        ${speedTag}${hpTag}
+        ${speedTag}${exitTag}${hpTag}
       </div>
     </div>
   </div>`;
