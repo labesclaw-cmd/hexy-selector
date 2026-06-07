@@ -774,9 +774,11 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES) {
     const HP_calc = P_model / 0.746;
     const motor = MOTOR_TABLE.find(m => m.hp >= Math.max(sz.min_hp, HP_calc));
     if (!motor) continue;
-    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, hp: motor.hp, HP_calc, r });
+    const vTip = Math.PI * (sz.D_imp / 1000) * N_model / 60;
+    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, vTip, tipOk: vTip <= 50, hp: motor.hp, HP_calc, r });
   }
-  const best = results[0] || null;
+  const okResults = results.filter(r => r.tipOk);
+  const best = (okResults.length > 0 ? okResults : results)[0] || null;
   return { results, best };
 }
 
@@ -933,9 +935,10 @@ function runSelect() {
 function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs) {
   const badge = isBest ? `<span class="best-badge">✦ 最佳選擇</span>` : '';
   const speedPct = Math.round(r.N_rpm / r.N_max * 100);
-  const speedTag = speedPct <= 80
+  const vTipStr = r.vTip ? r.vTip.toFixed(1) : '?';
+  const speedTag = r.tipOk
     ? `<span class="tag">轉速 ${speedPct}%</span>`
-    : `<span class="tag warn">轉速 ${speedPct}%</span>`;
+    : `<span class="tag warn">超過選機轉速</span>`;
   const hpTag = `<span class="tag">計算 ${r.HP_calc.toFixed(2)} HP</span>`;
   return `
   <div class="result-card${isBest ? ' best' : ''}">
@@ -967,7 +970,7 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs) {
       </div>
       <hr class="divider">
       <div class="q-ps-row">
-        最高轉速 <strong>${r.N_max} RPM</strong>
+        切線速度 <strong>${vTipStr} m/s</strong>　最高轉速 <strong>${r.N_max} RPM</strong>
       </div>
       <div class="tags" style="margin-top:10px">
         ${speedTag}${hpTag}
