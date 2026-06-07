@@ -744,7 +744,7 @@ function setFanType(type) {
 }
 
 // Shared centrifugal fan algorithm (quadratic intersection, matches Excel v3.2)
-function centrifugalSelect(q_target, ps_target, f, BASES, SIZES) {
+function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50) {
   const results = [];
   for (const sz of SIZES) {
     const base = BASES[sz.base];
@@ -776,7 +776,7 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES) {
     const motor = MOTOR_TABLE.find(m => m.hp >= Math.max(sz.min_hp, HP_calc));
     if (!motor) continue;
     const vTip = Math.PI * (sz.D_imp / 1000) * N_model / 60;
-    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, vTip, tipOk: vTip <= 50, hp: motor.hp, HP_calc, r });
+    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, vTip, tipOk: vTip <= tipLimit, hp: motor.hp, HP_calc, r });
   }
   const okResults = results.filter(r => r.tipOk);
   const best = (okResults.length > 0 ? okResults : results)[0] || null;
@@ -892,7 +892,8 @@ function runSelect() {
       hbs: [HBS_BASES, HBS_SIZES, 'HBS', '單吸前傾離心風機']
     };
     const [BASES, SIZES, prefix, desc] = MAP[type];
-    let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES);
+    const tipLimit = type === 'hbs' ? Infinity : 50;
+    let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit);
     if (cent_hp_max) {
       results = results.filter(r => r.hp === parseFloat(cent_hp_max));
       best = results[0] || null;
