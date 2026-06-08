@@ -1122,7 +1122,7 @@ function displayCentrifugalResults(results, targetQ, targetPs, best, prefix, ful
     html = results.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs, hpLocked)).join('');
   }
   container.innerHTML = html;
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderHrCard(r, isBest, targetQ, targetPs) {
@@ -1175,7 +1175,7 @@ function displayHrResults(results, targetQ, targetPs, best) {
     html = results.map(r => renderHrCard(r, false, targetQ, targetPs)).join('');
   }
   container.innerHTML = html;
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function displayResults(results, targetQ, targetPs, bestResult) {
@@ -1254,7 +1254,7 @@ function displayResults(results, targetQ, targetPs, bestResult) {
   }
   container.innerHTML = html;
 
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function clearAll() {
