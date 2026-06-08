@@ -1062,7 +1062,7 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs, h
   const hpTag = `<span class="tag">計算 ${r.HP_calc.toFixed(2)} HP</span>`;
   const exitTag = `<span class="tag">出口風速 ${vExitStr} m/s</span>`;
   const frameTag = (!hpLocked && r.min_hp && r.HP_calc < r.min_hp)
-    ? `<span class="tag tag-warning" title="此機型機架規格要求最低 ${r.min_hp} HP，實際軸功僅 ${r.HP_calc.toFixed(2)} HP">⚠ 馬達受機架規格限制</span>`
+    ? `<span class="tag tag-warning" title="此機型機架規格要求最低 ${r.min_hp} HP，實際軸功僅 ${r.HP_calc.toFixed(2)} HP">⚠ 此機型有最小馬力需求，馬達受機架規格限制</span>`
     : '';
   return `
   <div class="result-card${isBest ? ' best' : ''}">
