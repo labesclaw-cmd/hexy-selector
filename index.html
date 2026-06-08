@@ -1040,7 +1040,9 @@ function runSelect() {
   }
   matched.sort((a, b) => parseInt(a.size) - parseInt(b.size) || a.hp - b.hp);
   let bestResult = null;
-  if (!pole || !hp_max) {
+  if (pole && hp_max) {
+    bestResult = matched[0] || null;
+  } else {
     const kW_req = q * ps / 2550;
     const minHP = (MOTOR_TABLE.find(m => m.kw >= kW_req) || MOTOR_TABLE[MOTOR_TABLE.length-1]).hp;
     bestResult = matched.find(r => r.hp >= minHP) || matched[0] || null;
