@@ -212,6 +212,12 @@
     border: 1.5px solid #c62828;
     letter-spacing: 0.02em;
   }
+  .tag.tag-warning {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1.5px solid #ff9800;
+    font-size: 12px;
+  }
   .result-card.best { border: 2px solid var(--primary); }
   .best-badge {
     background: var(--primary); color: white;
@@ -876,7 +882,7 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50, 
     const v_exit = outletArea ? (q_target / 60 / outletArea) : 0;
     const exitOk = v_exit <= exitLimit;
     if (!tipOk || !exitOk) continue;
-    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, vTip, tipOk, hp: motor.hp, HP_calc, r, v_exit, exitOk });
+    results.push({ size: sz.size, D_imp: sz.D_imp, N_rpm: Math.round(N_model), N_max: sz.N_max, vTip, tipOk, hp: motor.hp, HP_calc, min_hp: sz.min_hp, r, v_exit, exitOk });
   }
   const sortByHpSize = (a, b) => a.hp - b.hp || parseInt(a.size) - parseInt(b.size);
   results.sort(sortByHpSize);
@@ -1054,6 +1060,9 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs) {
   const speedTag = `<span class="tag">轉速 ${speedPct}%</span>`;
   const hpTag = `<span class="tag">計算 ${r.HP_calc.toFixed(2)} HP</span>`;
   const exitTag = `<span class="tag">出口風速 ${vExitStr} m/s</span>`;
+  const frameTag = (r.min_hp && r.HP_calc < r.min_hp)
+    ? `<span class="tag tag-warning" title="此機型機架規格要求最低 ${r.min_hp} HP，實際軸功僅 ${r.HP_calc.toFixed(2)} HP">⚠ 馬達受機架規格限制</span>`
+    : '';
   return `
   <div class="result-card${isBest ? ' best' : ''}">
     <div class="card-header">
@@ -1087,7 +1096,7 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs) {
         切線速度 <strong>${vTipStr} m/s</strong>　最高轉速 <strong>${r.N_max} RPM</strong>
       </div>
       <div class="tags" style="margin-top:10px">
-        ${speedTag}${exitTag}${hpTag}
+        ${speedTag}${exitTag}${hpTag}${frameTag}
       </div>
     </div>
   </div>`;
