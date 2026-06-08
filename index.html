@@ -1122,7 +1122,10 @@ function displayCentrifugalResults(results, targetQ, targetPs, best, prefix, ful
     html = results.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs, hpLocked)).join('');
   }
   container.innerHTML = html;
-  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  requestAnimationFrame(() => {
+    const hh = document.querySelector('header').offsetHeight;
+    window.scrollTo({ top: container.getBoundingClientRect().top + window.scrollY - hh, behavior: 'smooth' });
+  });
 }
 
 function renderHrCard(r, isBest, targetQ, targetPs) {
@@ -1175,7 +1178,10 @@ function displayHrResults(results, targetQ, targetPs, best) {
     html = results.map(r => renderHrCard(r, false, targetQ, targetPs)).join('');
   }
   container.innerHTML = html;
-  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  requestAnimationFrame(() => {
+    const hh = document.querySelector('header').offsetHeight;
+    window.scrollTo({ top: container.getBoundingClientRect().top + window.scrollY - hh, behavior: 'smooth' });
+  });
 }
 
 function displayResults(results, targetQ, targetPs, bestResult) {
@@ -1253,8 +1259,10 @@ function displayResults(results, targetQ, targetPs, bestResult) {
     html = results.map(r => renderCard(r, false)).join('');
   }
   container.innerHTML = html;
-
-  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  requestAnimationFrame(() => {
+    const hh = document.querySelector('header').offsetHeight;
+    window.scrollTo({ top: container.getBoundingClientRect().top + window.scrollY - hh, behavior: 'smooth' });
+  });
 }
 
 function clearAll() {
