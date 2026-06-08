@@ -886,7 +886,8 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50, 
   }
   const sortByHpSize = (a, b) => a.hp - b.hp || parseInt(a.size) - parseInt(b.size);
   results.sort(sortByHpSize);
-  const best = results[0] || null;
+  const isFrameLimited = r => r.min_hp && r.HP_calc < r.min_hp;
+  const best = results.find(r => !isFrameLimited(r)) || results[0] || null;
   return { results, best };
 }
 
