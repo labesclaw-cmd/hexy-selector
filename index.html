@@ -163,6 +163,7 @@
     margin-bottom: 12px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     overflow: hidden;
+    scroll-margin-top: 80px;
   }
   .result-card .card-header {
     background: var(--primary-light);
@@ -1122,10 +1123,7 @@ function displayCentrifugalResults(results, targetQ, targetPs, best, prefix, ful
     html = results.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs, hpLocked)).join('');
   }
   container.innerHTML = html;
-  requestAnimationFrame(() => {
-    const hh = document.querySelector('header').offsetHeight;
-    window.scrollTo({ top: container.getBoundingClientRect().top + window.scrollY - hh, behavior: 'smooth' });
-  });
+  setTimeout(() => { const c = container.firstElementChild; if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 0);
 }
 
 function renderHrCard(r, isBest, targetQ, targetPs) {
@@ -1178,10 +1176,7 @@ function displayHrResults(results, targetQ, targetPs, best) {
     html = results.map(r => renderHrCard(r, false, targetQ, targetPs)).join('');
   }
   container.innerHTML = html;
-  requestAnimationFrame(() => {
-    const hh = document.querySelector('header').offsetHeight;
-    window.scrollTo({ top: container.getBoundingClientRect().top + window.scrollY - hh, behavior: 'smooth' });
-  });
+  setTimeout(() => { const c = container.firstElementChild; if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 0);
 }
 
 function displayResults(results, targetQ, targetPs, bestResult) {
@@ -1259,10 +1254,7 @@ function displayResults(results, targetQ, targetPs, bestResult) {
     html = results.map(r => renderCard(r, false)).join('');
   }
   container.innerHTML = html;
-  requestAnimationFrame(() => {
-    const hh = document.querySelector('header').offsetHeight;
-    window.scrollTo({ top: container.getBoundingClientRect().top + window.scrollY - hh, behavior: 'smooth' });
-  });
+  setTimeout(() => { const c = container.firstElementChild; if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 0);
 }
 
 function clearAll() {
