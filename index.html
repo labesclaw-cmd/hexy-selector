@@ -1043,12 +1043,7 @@ function runSelect() {
   if (!pole || !hp_max) {
     const kW_req = q * ps / 2550;
     const minHP = (MOTOR_TABLE.find(m => m.kw >= kW_req) || MOTOR_TABLE[MOTOR_TABLE.length-1]).hp;
-    bestResult = matched.filter(r => r.hp >= minHP).reduce((b, r) => {
-      if (!b) return r;
-      if (r.hp < b.hp) return r;
-      if (r.hp === b.hp && parseInt(r.size) < parseInt(b.size)) return r;
-      return b;
-    }, null);
+    bestResult = matched.find(r => r.hp >= minHP) || matched[0] || null;
   }
   displayResults(matched, q, ps, bestResult);
 }
