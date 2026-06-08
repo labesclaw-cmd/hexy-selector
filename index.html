@@ -652,11 +652,26 @@ const HBS_BASES = {
     {Q:77, Ps:104.6,Pt:104.9,P:3.5}
   ]},
   "1000": { D_imp:1000, N_base:928, pts:[
-    {Q:834,Ps:0.2,  Pt:21.4, P:18.5},
-    {Q:716,Ps:49.1, Pt:64.7, P:18.1},
-    {Q:598,Ps:71.8, Pt:82.7, P:16.2},
-    {Q:476,Ps:101.8,Pt:108.7,P:14.3},
-    {Q:237,Ps:148.9,Pt:150.6,P:10.0}
+    {Q:834,  Ps:0.2,  Pt:21.4,  P:18.49},
+    {Q:716,  Ps:49.2, Pt:64.8,  P:18.13},
+    {Q:599.5,Ps:72.3, Pt:83.2,  P:16.33},
+    {Q:478.2,Ps:102.9,Pt:109.9, P:14.55},
+    {Q:359.3,Ps:132.1,Pt:136.0, P:12.45},
+    {Q:240.3,Ps:152.5,Pt:154.2, P:10.32},
+    {Q:123.8,Ps:150.9,Pt:151.3, P: 8.33}
+  ]},
+  // Excel VLOOKUP($C$112:$D$118) only covers up to size 1000 (offset 61).
+  // VLOOKUP(1120,...) approximate-matches 1000→61, loading HBS-1000 data.
+  // But r still divides by 1120 (D91=1120 in Excel model table).
+  // So HBS-1250/1400/1600/1800 use HBS-1000 pts with D_imp=1120 for r.
+  "1000_d1120": { D_imp:1120, N_base:928, pts:[
+    {Q:834,  Ps:0.2,  Pt:21.4,  P:18.49},
+    {Q:716,  Ps:49.2, Pt:64.8,  P:18.13},
+    {Q:599.5,Ps:72.3, Pt:83.2,  P:16.33},
+    {Q:478.2,Ps:102.9,Pt:109.9, P:14.55},
+    {Q:359.3,Ps:132.1,Pt:136.0, P:12.45},
+    {Q:240.3,Ps:152.5,Pt:154.2, P:10.32},
+    {Q:123.8,Ps:150.9,Pt:151.3, P: 8.33}
   ]},
   "1120": { D_imp:1120, N_base:950, pts:[
     {Q:1055.6,Ps:1.8,  Pt:22.8, P:24.06},
@@ -681,10 +696,10 @@ const HBS_SIZES = [
   {size:"900", D_imp:900,  base:"900",  N_max:1360, min_hp:7.5},
   {size:"1000",D_imp:1000, base:"1000", N_max:1220, min_hp:10},
   {size:"1120",D_imp:1120, base:"1120", N_max:1090, min_hp:15},
-  {size:"1250",D_imp:1250, base:"1120", N_max:980,  min_hp:20},
-  {size:"1400",D_imp:1400, base:"1120", N_max:870,  min_hp:25},
-  {size:"1600",D_imp:1600, base:"1120", N_max:760,  min_hp:25},
-  {size:"1800",D_imp:1800, base:"1120", N_max:680,  min_hp:40}
+  {size:"1250",D_imp:1250, base:"1000_d1120", N_max:980,  min_hp:20},
+  {size:"1400",D_imp:1400, base:"1000_d1120", N_max:870,  min_hp:25},
+  {size:"1600",D_imp:1600, base:"1000_d1120", N_max:760,  min_hp:25},
+  {size:"1800",D_imp:1800, base:"1000_d1120", N_max:680,  min_hp:40}
 ];
 
 // RP 無殼式 (f=0.5 箱型, f=0 裸機)
