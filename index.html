@@ -659,11 +659,13 @@ const HBS_BASES = {
     {Q:237,Ps:148.9,Pt:150.6,P:10.0}
   ]},
   "1120": { D_imp:1120, N_base:950, pts:[
-    {Q:1056,Ps:1.8, Pt:22.8, P:24.1},
-    {Q:910, Ps:65.0,Pt:80.5, P:25.0},
-    {Q:754, Ps:95.6,Pt:106.3,P:23.0},
-    {Q:447, Ps:161.6,Pt:165.3,P:19.1},
-    {Q:190, Ps:187.5,Pt:188.2,P:14.8}
+    {Q:1055.6,Ps:1.8,  Pt:22.8, P:24.06},
+    {Q:909,   Ps:65.0, Pt:80.5, P:25.01},
+    {Q:753.9, Ps:95.6, Pt:106.3,P:22.97},
+    {Q:602.4, Ps:136.0,Pt:142.8,P:21.75},
+    {Q:446.8, Ps:161.6,Pt:165.3,P:19.24},
+    {Q:312.1, Ps:183.8,Pt:185.7,P:17.19},
+    {Q:190.7, Ps:189.1,Pt:189.8,P:14.95}
   ]}
 };
 const HBS_SIZES = [
@@ -823,7 +825,7 @@ function polyFitP(pts, q) {
 }
 
 // Shared centrifugal fan algorithm (quadratic intersection, matches Excel v3.2)
-function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50, OUTLET_AREA = {}, exitLimit = Infinity) {
+function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50, OUTLET_AREA = {}, exitLimit = Infinity, efficiency = 0.98) {
   const results = [];
   for (const sz of SIZES) {
     const base = BASES[sz.base];
@@ -850,7 +852,7 @@ function centrifugalSelect(q_target, ps_target, f, BASES, SIZES, tipLimit = 50, 
     if (N_model > sz.N_max || N_model < 1) continue;
     const P_shaft = pt1.P + (pt2.P - pt1.P) * (Q_base_star - pt1.Q) / (pt2.Q - pt1.Q);
     const P_model = P_shaft * Math.pow(N_model / base.N_base, 3) * r5;
-    const HP_calc = P_model / 0.746 / 0.98;
+    const HP_calc = P_model / 0.746 / efficiency;
     const motor = MOTOR_TABLE.find(m => m.hp >= Math.max(sz.min_hp, HP_calc));
     if (!motor) continue;
     const vTip = Math.PI * (sz.D_imp / 1000) * N_model / 60;
@@ -983,7 +985,8 @@ function runSelect() {
     const tipLimit = tipLimits[type] ?? 50;
     const exitLimit = exitLimits[type] ?? Infinity;
     const OUTLET_AREA = outletAreas[type] ?? {};
-    let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit, OUTLET_AREA, exitLimit);
+    const driveEff = type === 'hbs' ? 0.95 : 0.98;
+    let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit, OUTLET_AREA, exitLimit, driveEff);
     if (cent_hp_max) {
       results = results.filter(r => r.hp === parseFloat(cent_hp_max));
       best = results[0] || null;
