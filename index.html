@@ -219,6 +219,12 @@
     border: 1.5px solid #ff9800;
     font-size: 12px;
   }
+  .tag.tag-info {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1.5px solid #1976d2;
+    font-size: 12px;
+  }
   .result-card.best { border: 2px solid var(--primary); }
   .best-badge {
     background: var(--primary); color: white;
@@ -989,7 +995,7 @@ function runSelect() {
       results = results.filter(r => r.hp <= parseFloat(rp_hp_max));
       best = results[0] || null;
     }
-    displayCentrifugalResults(results, q, ps, best, 'RP', '無殼式離心風機', !!rp_hp_max);
+    displayCentrifugalResults(results, q, ps, best, 'RP', '無殼式離心風機', rp_hp_max);
     return;
   }
 
@@ -1020,7 +1026,7 @@ function runSelect() {
       results.sort(sortBySize);
       best = results[0] || null;
     }
-    displayCentrifugalResults(results, q, ps, best, prefix, desc, !!cent_hp_max);
+    displayCentrifugalResults(results, q, ps, best, prefix, desc, cent_hp_max);
     return;
   }
 
@@ -1053,7 +1059,7 @@ function runSelect() {
   displayResults(matched, q, ps, bestResult);
 }
 
-function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs, hpLocked = false) {
+function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs, hpLimit = null) {
   const badge = isBest ? `<span class="best-badge">✦ 最佳選擇</span>` : '';
   const speedPct = Math.round(r.N_rpm / r.N_max * 100);
   const vTipStr = r.vTip ? r.vTip.toFixed(1) : '?';
@@ -1061,7 +1067,7 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs, h
   const speedTag = `<span class="tag">轉速 ${speedPct}%</span>`;
   const hpTag = `<span class="tag">計算 ${r.HP_calc.toFixed(2)} HP</span>`;
   const exitTag = `<span class="tag">出口風速 ${vExitStr} m/s</span>`;
-  const frameTag = (!hpLocked && r.min_hp && r.HP_calc < r.min_hp)
+  const frameTag = (!hpLimit && r.min_hp && r.HP_calc < r.min_hp)
     ? `<span class="tag tag-warning" title="此機型機架規格要求最低 ${r.min_hp} HP，實際軸功僅 ${r.HP_calc.toFixed(2)} HP">⚠ 此機型有最小馬力需求，馬達受機架規格限制</span>`
     : '';
   return `
@@ -1097,13 +1103,13 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs, h
         切線速度 <strong>${vTipStr} m/s</strong>　最高轉速 <strong>${r.N_max} RPM</strong>
       </div>
       <div class="tags" style="margin-top:10px">
-        ${speedTag}${exitTag}${hpTag}${frameTag}
+        ${hpLimit ? `<span class="tag tag-info">HP上限 ${hpLimit} HP</span>` : ''}${speedTag}${exitTag}${hpTag}${frameTag}
       </div>
     </div>
   </div>`;
 }
 
-function displayCentrifugalResults(results, targetQ, targetPs, best, prefix, fullDesc, hpLocked = false) {
+function displayCentrifugalResults(results, targetQ, targetPs, best, prefix, fullDesc, hpLimit = null) {
   const section = document.getElementById('results-section');
   const container = document.getElementById('results');
   section.style.display = 'block';
@@ -1115,14 +1121,14 @@ function displayCentrifugalResults(results, targetQ, targetPs, best, prefix, ful
   }
   let html = '';
   if (best) {
-    html += renderCentrifugalCard(best, prefix, fullDesc, true, targetQ, targetPs, hpLocked);
+    html += renderCentrifugalCard(best, prefix, fullDesc, true, targetQ, targetPs, hpLimit);
     const others = results.filter(r => r !== best);
     if (others.length > 0) {
       html += `<div class="section-label">所有符合機型（${results.length} 款）</div>`;
-      html += others.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs, hpLocked)).join('');
+      html += others.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs, hpLimit)).join('');
     }
   } else {
-    html = results.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs, hpLocked)).join('');
+    html = results.map(r => renderCentrifugalCard(r, prefix, fullDesc, false, targetQ, targetPs, hpLimit)).join('');
   }
   container.innerHTML = html;
   setTimeout(() => { const c = container.firstElementChild; if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 0);
