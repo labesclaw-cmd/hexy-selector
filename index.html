@@ -1012,7 +1012,9 @@ function runSelect() {
     let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit, OUTLET_AREA, exitLimit, driveEff);
     if (cent_hp_max) {
       results = results.filter(r => r.hp <= parseFloat(cent_hp_max));
-      best = results[0] || null;
+      best = results.length
+        ? results.slice().sort((a, b) => parseInt(a.size) - parseInt(b.size) || a.hp - b.hp)[0]
+        : null;
     } else if (type === 'hbs') {
       const sortBySize = (a, b) => parseInt(a.size) - parseInt(b.size);
       results.sort(sortBySize);
