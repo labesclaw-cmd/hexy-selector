@@ -230,6 +230,8 @@
     vertical-align: middle;
     font-weight: 600;
     margin-left: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .result-card.best { border: 2px solid var(--primary); }
   .best-badge {
@@ -1096,7 +1098,7 @@ function renderCentrifugalCard(r, prefix, fullDesc, isBest, targetQ, targetPs, h
           <span class="spec-value">${targetPs} <span class="unit">mmAq</span></span>
         </div>
         <div class="spec-item">
-          <span class="spec-label" style="display:flex;align-items:center;gap:4px">需求馬力${hpLimit ? `<span class="hp-limit-badge">指定HP ${hpLimit}</span>` : ''}</span>
+          <span class="spec-label" style="display:flex;align-items:center;gap:4px"><span style="white-space:nowrap">需求馬力</span>${hpLimit ? `<span class="hp-limit-badge">指定HP ${hpLimit}</span>` : ''}</span>
           <span class="spec-value">${r.hp} <span class="unit">HP</span></span>
         </div>
         <div class="spec-item">
