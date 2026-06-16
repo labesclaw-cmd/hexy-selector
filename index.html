@@ -357,7 +357,7 @@
         </select>
       </div>
       <div class="field">
-        <label>HP 指定</label>
+        <label>HP 上限</label>
         <select id="cent_hp_max">
           <option value="">不限</option>
           <option value="0.5">0.5 HP</option>
@@ -386,7 +386,7 @@
         </select>
       </div>
       <div class="field">
-        <label>HP 指定</label>
+        <label>HP 上限</label>
         <select id="rp_hp_max">
           <option value="">不限</option>
           <option value="1">1 HP</option>
@@ -986,7 +986,7 @@ function runSelect() {
     const rp_f = document.getElementById('rp_enclosure').value === 'box' ? 0.5 : 0;
     let { results, best } = centrifugalSelect(q, ps, rp_f, RP_BASES, RP_SIZES, 54, RP_OUTLET_AREA, 20);
     if (rp_hp_max) {
-      results = results.filter(r => r.hp === parseFloat(rp_hp_max));
+      results = results.filter(r => r.hp <= parseFloat(rp_hp_max));
       best = results[0] || null;
     }
     displayCentrifugalResults(results, q, ps, best, 'RP', '無殼式離心風機', !!rp_hp_max);
@@ -1011,7 +1011,7 @@ function runSelect() {
     const driveEff = type === 'hbs' ? 0.95 : 0.98;
     let { results, best } = centrifugalSelect(q, ps, f, BASES, SIZES, tipLimit, OUTLET_AREA, exitLimit, driveEff);
     if (cent_hp_max) {
-      results = results.filter(r => r.hp === parseFloat(cent_hp_max));
+      results = results.filter(r => r.hp <= parseFloat(cent_hp_max));
       best = results[0] || null;
     } else if (type === 'hbs') {
       const sortBySize = (a, b) => parseInt(a.size) - parseInt(b.size);
