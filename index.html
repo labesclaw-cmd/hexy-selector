@@ -958,7 +958,16 @@ function interpolateQ(qt, ps_max, targetPs) {
   }
   
   if (lo === null) return qt[0] || null;
-  if (hi === null || lo === hi) {
+  if (hi === null) {
+    // targetPs 超過最後一個數據點：向 ps_max（風量歸零點）線性外插
+    // 修正 2026-07-06：原本直接回傳 qt[lo]，導致 ps>100 時虛報最大風量
+    // （例 VAF-1120 30HP/4P @110mmAq 顯示 684，實應約 584，Excel=591）
+    const q_lo = qt[lo];
+    if (q_lo === null || q_lo === undefined) return null;
+    if (ps_max <= lo) return null;
+    return q_lo * (ps_max - targetPs) / (ps_max - lo);
+  }
+  if (lo === hi) {
     const v = qt[lo];
     return (v !== null && v !== undefined) ? v : null;
   }
