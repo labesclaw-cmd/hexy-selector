@@ -1102,15 +1102,11 @@ function runSelect() {
     }
     for (const m of seen.values()) matched.push(m);
   }
-  matched.sort((a, b) => parseInt(a.size) - parseInt(b.size) || a.hp - b.hp);
-  let bestResult = null;
-  if (pole && hp_max) {
-    bestResult = matched[0] || null;
-  } else {
-    const kW_req = q * ps / 2550;
-    const minHP = (MOTOR_TABLE.find(m => m.kw >= kW_req) || MOTOR_TABLE[MOTOR_TABLE.length-1]).hp;
-    bestResult = matched.find(r => r.hp >= minHP) || matched[0] || null;
-  }
+  // 11/06 James：軸流以「所有符合機型」第一款為最佳選擇。
+  // 排序＝馬力小→大，同馬力機號小→大（同機號同馬力取風量大者在前）；第一款即最佳。
+  // 舊版用 q×ps/2550 估 kW 再挑，會跳過實際可用的較小馬力（例 350CMM/140mmAq 選到 1120/50HP，而 1250/30HP 已足夠）。
+  matched.sort((a, b) => a.hp - b.hp || parseInt(a.size) - parseInt(b.size) || b.maxQ - a.maxQ);
+  const bestResult = matched[0] || null;
   displayResults(matched, q, ps, bestResult);
 }
 
